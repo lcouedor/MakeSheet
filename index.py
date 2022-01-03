@@ -26,19 +26,20 @@ def AccueilPageFct():
     a.start()
 
 
-fenetre = Tk()
-fenetre.title("Make Sheet")
-fenetre.geometry("1080x720")
-fenetre.config(background="WHITE")
-frameBouton= Frame(fenetre)
+fenetre = Tk()#Création de la fenêtre 
+fenetre.title("Make Sheet")#Nom de la fenêtre
+fenetre.geometry("1080x720")#Dimension de la fenêtre
+fenetre.config(background="WHITE")#Couleur du background
+frameBouton= Frame(fenetre)#création de la zone de bouton
 frameBouton.config(background="WHITE")
-accueil=Button(frameBouton, text="Accueil Page", command=AccueilPageFct)
-tuner=Button(frameBouton, text="Tuner Page", command=TunerPageFct)
-partition=Button(frameBouton, text="Partition Page", command=PartitionPageFct)
+accueil=Button(frameBouton, text="Accueil Page", command=AccueilPageFct)#Bouton pour accèder à l'accueil
+tuner=Button(frameBouton, text="Tuner Page", command=TunerPageFct)#Bouton pour accèder à l'accordeur
+partition=Button(frameBouton, text="Partition Page", command=PartitionPageFct)#Bouton pour accèder à la partition
 accueil.pack()
 tuner.pack()
 partition.pack()
 frameBouton.pack()
+#Création des frames pour les différentes page que l'on ajoutera ou supprimera de la fenetre en fonction de la page demandée
 frameAccueil = Frame(fenetre)
 frameAccueil.config(background="WHITE")
 frameAccueil.pack()
