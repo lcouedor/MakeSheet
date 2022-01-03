@@ -27,7 +27,7 @@ def AccueilPageFct():
 
 
 fenetre = Tk()
-fenetre.title("Application")
+fenetre.title("Make Sheet")
 fenetre.geometry("1080x720")
 fenetre.config(background="WHITE")
 frameBouton= Frame(fenetre)
