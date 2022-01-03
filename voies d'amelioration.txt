@@ -1,0 +1,5 @@
+Voies d'amélioration :
+    - utiliser un autre système de création de partition pour prendre en compte les nuances etc
+    - mettre paramètre de quel instrument utilisé pour adapter chunk (théorème shannon)
+
+Limitations :
