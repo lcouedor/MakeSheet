@@ -23,35 +23,22 @@ class Tuner(threading.Thread):
         self.finTot=0
         self.finNote=0
         self.debNote=0
-        # self.deb = Label(self.fenetre)
-        # self.deb["text"]=""
-        # self.deb.config(background="#098864")
-        # self.fin = Label(self.fenetre)
-        # self.fin["text"]=""
-        # self.fin.config(background="#098864")
-        # self.freq = Label(self.fenetre)
-        # self.freq["text"]=""
-        # self.freq.config(background="#098864")
-        # self.freqBase = Label(self.fenetre)
-        # self.freqBase["text"]=""
-        # self.freqBase.config(background="#098864")
         self.ecart = Label(self.fenetre)
         self.ecart["text"]=""
         self.ecart.config(background="WHITE")
         self.label.pack()
-        # self.deb.pack()
-        # self.fin.pack()
-        # self.freq.pack()
-        # self.freqBase.pack()
         self.ecart.pack()
         self.CAN_Zone = Canvas ( self.fenetre , bg = "white" , height = 350 , width = 1080 )
         self.CAN_Zone.pack()
-        self.CAN_Zone_Total = self.CAN_Zone.create_arc ( 10 , 10 , 510 , 510 , start = 0 , extent = 180 , fill = "#CCD1D1",outline="" )
-        self.CAN_Zone_Red = self.CAN_Zone.create_arc ( 10 , 10 ,510 , 510  , start=0, extent =0, fill = "#F0B27A",outline="")
-        self.CAN_Zone_Green = self.CAN_Zone.create_arc ( 10 , 10 , 510 , 510  , start=0, extent =0, fill = "#82E0AA",outline="")
-        self.CAN_Zone_Yellow = self.CAN_Zone.create_arc ( 10 , 10 , 510 , 510  , start=0, extent =0, fill = "#F4D03F",outline="")
+        self.CAN_Zone_Total = self.CAN_Zone.create_arc ( 20 , 20 , 520 , 520 , start = 0 , extent = 180 , fill = "#CCD1D1",outline="" )
+        self.CAN_Zone_Red = self.CAN_Zone.create_arc ( 20 , 20 , 520 , 520 , start=0, extent =0, fill = "#F0B27A",outline="")
+        self.CAN_Zone_Green = self.CAN_Zone.create_arc ( 20 , 20 , 520 , 520   , start=0, extent =0, fill = "#82E0AA",outline="")
+        self.CAN_Zone_Yellow = self.CAN_Zone.create_arc ( 20 , 20 , 520 , 520  , start=0, extent =0, fill = "#F4D03F",outline="")
         self.CAN_aiguille =0
         self.CAN_norm =0
+        self.note=0
+        self.notePrec=0
+        self.noteSucc=0
         self.bouton_lancer = Button(fenetre, text="Lancer", command=self.lancer)
         self.bouton_lancer.pack()
         self.bouton_stop = Button(fenetre, text="stop", command=self.pause)
@@ -120,26 +107,26 @@ class Tuner(threading.Thread):
             if(notePrec[0] != "-"):
                 print(notePrec[0])
             if(res[0]!='-'):
-                # self.freq["text"]="Frequence obtenue : ",freq_in_hertz
                 self.label["text"]="Note : ",res[0]
-                # self.freqBase["text"]="Frequence de base : ",res[1]
-                self.CAN_Zone.delete(self.CAN_aiguille,self.CAN_norm,self.CAN_Zone_Green,self.CAN_Zone_Red,self.CAN_Zone_Yellow)
+                self.CAN_Zone.delete(self.CAN_aiguille,self.CAN_norm,self.CAN_Zone_Green,self.CAN_Zone_Red,self.CAN_Zone_Yellow,self.note,self.notePrec,self.noteSucc)
                 self.debTot=res[2]
                 self.finTot=res[3]
                 self.finNote=(res[3]+res[1])/2
                 self.debNote=(res[2]+res[1])/2
-                # self.fin["text"]="Début : ",fin
-                # self.deb["text"]="Fin : ",deb
                 self.ecart["text"]="Ecart : ",res[4]
-                x=int(260+235*cos(radians(180+((freq_in_hertz*180/(self.finTot-self.debTot))-(self.debTot*180/(self.finTot-self.debTot))))))
-                y=int(260+235*sin(radians(180+((freq_in_hertz*180/(self.finTot-self.debTot))-(self.debTot*180/(self.finTot-self.debTot))))))
-                xn=int(260+250*cos(radians(180+((res[1]*180/(self.finTot-self.debTot))-(self.debTot*180/(self.finTot-self.debTot))))))
-                yn=int(260+250*sin(radians(180+((res[1]*180/(self.finTot-self.debTot))-(self.debTot*180/(self.finTot-self.debTot))))))
-                self.CAN_Zone_Green = self.CAN_Zone.create_arc ( 10 , 10 , 510 , 510 , start=(self.finTot*180/(self.finTot-self.debTot))-(self.finNote*180/(self.finTot-self.debTot)), extent =(self.finNote*180/(self.finTot-self.debTot))-(self.debNote*180/(self.finTot-self.debTot)), fill = "#82E0AA",outline="")
-                self.CAN_Zone_Red = self.CAN_Zone.create_arc ( 10 , 10 ,  510 , 510 , start=(self.finTot*180/(self.finTot-self.debTot))-(self.finNote*180/(self.finTot-self.debTot))+(self.finNote*180/(self.finTot-self.debTot))-(self.debNote*180/(self.finTot-self.debTot)), extent =(self.debNote*180/(self.finTot-self.debTot))-(self.debTot*180/(self.finTot-self.debTot)), fill = "#F0B27A",outline="")
-                self.CAN_Zone_Yellow = self.CAN_Zone.create_arc ( 10 , 10 ,  510 , 510 , start=0, extent =(self.finTot*180/(self.finTot-self.debTot))-(self.finNote*180/(self.finTot-self.debTot)), fill = "#F4D03F",outline="")
-                self.CAN_norm = self.CAN_Zone.create_line(260, 260 , xn , yn,fill="#8E44AD")
-                self.CAN_aiguille = self.CAN_Zone.create_line(260, 260, x , y,fill="#E74C3C",width=2,arrow='last')
+                x=int(270+235*cos(radians(180+((freq_in_hertz*180/(self.finTot-self.debTot))-(self.debTot*180/(self.finTot-self.debTot))))))
+                y=int(270+235*sin(radians(180+((freq_in_hertz*180/(self.finTot-self.debTot))-(self.debTot*180/(self.finTot-self.debTot))))))
+                xn=int(270+250*cos(radians(180+((res[1]*180/(self.finTot-self.debTot))-(self.debTot*180/(self.finTot-self.debTot))))))
+                yn=int(270+250*sin(radians(180+((res[1]*180/(self.finTot-self.debTot))-(self.debTot*180/(self.finTot-self.debTot))))))
+                self.CAN_Zone_Green = self.CAN_Zone.create_arc ( 20 , 20 , 520 , 520  , start=(self.finTot*180/(self.finTot-self.debTot))-(self.finNote*180/(self.finTot-self.debTot)), extent =(self.finNote*180/(self.finTot-self.debTot))-(self.debNote*180/(self.finTot-self.debTot)), fill = "#82E0AA",outline="")
+                self.CAN_Zone_Red = self.CAN_Zone.create_arc ( 20 , 20 , 520 , 520  , start=(self.finTot*180/(self.finTot-self.debTot))-(self.finNote*180/(self.finTot-self.debTot))+(self.finNote*180/(self.finTot-self.debTot))-(self.debNote*180/(self.finTot-self.debTot)), extent =(self.debNote*180/(self.finTot-self.debTot))-(self.debTot*180/(self.finTot-self.debTot)), fill = "#F0B27A",outline="")
+                self.CAN_Zone_Yellow = self.CAN_Zone.create_arc ( 20 , 20 , 520 , 520  , start=0, extent =(self.finTot*180/(self.finTot-self.debTot))-(self.finNote*180/(self.finTot-self.debTot)), fill = "#F4D03F",outline="")
+                self.CAN_norm = self.CAN_Zone.create_line(270, 270 , xn , yn,fill="#8E44AD")
+                self.CAN_aiguille = self.CAN_Zone.create_line(270, 270, x , y,fill="#E74C3C",width=2,arrow='last')
+                self.note=self.CAN_Zone.create_text(270, 10, text = res[0] )
+                self.notePrec=self.CAN_Zone.create_text(20, 290, text = notePrec[0] )
+                self.noteSucc=self.CAN_Zone.create_text(520, 290, text = noteSuiv[0] )
+            
             
 
     def pause(self):
