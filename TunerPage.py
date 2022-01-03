@@ -114,6 +114,11 @@ class Tuner(threading.Thread):
 
             freq_in_hertz = abs(freq * frate)
             res=find_note(tab,freq_in_hertz)
+            notePrec = find_note(tab, freq_in_hertz/coeff_frequences) #nom de la note précédente
+            noteSuiv = find_note(tab, freq_in_hertz*coeff_frequences) #nom de la note suivante
+            #TODO à supprimer après les tests
+            if(notePrec[0] != "-"):
+                print(notePrec[0])
             if(res[0]!='-'):
                 # self.freq["text"]="Frequence obtenue : ",freq_in_hertz
                 self.label["text"]="Note : ",res[0]
