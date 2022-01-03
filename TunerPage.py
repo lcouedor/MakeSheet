@@ -114,7 +114,7 @@ class Tuner(threading.Thread):
 
             freq_in_hertz = abs(freq * frate)
             res=find_note(tab,freq_in_hertz)
-            notePrec = find_note(tab, freq_in_hertz/coeff_frequences) #nom de la note précédente
+            notePrec = find_note(tab, freq_in_hertz/coeff_frequences) #nom de la note précédente #TODO ? juste limiter à notePrec[0] pour avoir que le nom (le reste sert à rien pour cette utilisation)
             noteSuiv = find_note(tab, freq_in_hertz*coeff_frequences) #nom de la note suivante
             #TODO à supprimer après les tests
             if(notePrec[0] != "-"):
