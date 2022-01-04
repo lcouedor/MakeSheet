@@ -32,7 +32,7 @@ fenetre.geometry("1080x720")#Dimension de la fenêtre
 fenetre.config(background="WHITE")#Couleur du background
 frameBouton= Frame(fenetre)#création de la zone de bouton
 frameBouton.config(background="WHITE")
-accueil=Button(frameBouton, text="Accueil Page", command=AccueilPageFct)#Bouton pour accèder à l'accueil
+accueil=Button(frameBouton, text="Accueil Page", command=AccueilPageFct)#Bouton pour accéder à l'accueil
 tuner=Button(frameBouton, text="Tuner Page", command=TunerPageFct)#Bouton pour accèder à l'accordeur
 partition=Button(frameBouton, text="Partition Page", command=PartitionPageFct)#Bouton pour accèder à la partition
 accueil.pack()

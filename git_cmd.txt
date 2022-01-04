@@ -3,3 +3,4 @@ git pull
 git add .
 git commit -m "message"
 git push
+git stash #en cas d'erreur sur le pull ou il demande de commit avant alors qu'aucun changement n'a été fait
