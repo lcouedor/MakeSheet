@@ -9,21 +9,18 @@ def TunerPageFct():
     frameAccueil.pack_forget()
     framePartition.pack_forget()
     frameTuner.pack()
-    t.start()
         
 def PartitionPageFct():
     frameAccueil.pack_forget()
     frameTuner.pack_forget()
     framePartition.pack()
     t.pause()
-    p.start()
 
 def AccueilPageFct():
     framePartition.pack_forget()
     frameTuner.pack_forget()
     frameAccueil.pack()
     t.pause()
-    a.start()
 
 
 fenetre = Tk()#Création de la fenêtre 
@@ -44,10 +41,13 @@ frameAccueil = Frame(fenetre)
 frameAccueil.config(background="WHITE")
 frameAccueil.pack()
 a=Accueil(frameAccueil)
+a.start()
 frameTuner = Frame(fenetre)
 frameTuner.config(background="WHITE")
 t=Tuner(frameTuner)
+t.start()
 framePartition = Frame(fenetre)
 framePartition.config(background="WHITE")
 p=Partition(framePartition)
+p.start()
 fenetre.mainloop()
