@@ -9,12 +9,17 @@ from tkinter import ttk
 import time
 from math import *
 import os
-from midiutil.MidiFile import MIDIFile #TODO à mettre dans PartitionPage quand ce sera fait
+from midiutil.MidiFile import MIDIFile #TODO à mettre dans PartitionPage quand ce sera 
+from timeit import default_timer as timer
 
 def only_numbers(char):
     return char.isdigit()
 
+start = 0
+end = 0
+
 class Partition(threading.Thread):
+
     def __init__(self,fenetre,p):
         threading.Thread.__init__(self)
         self._stopevent = threading.Event( )
@@ -39,7 +44,8 @@ class Partition(threading.Thread):
         self.bouton_stop.pack()
         self.p=p
         self.filename="output2.wav" #nom du fichier temporaire ou est enregistré le son #TODO nom de fichier fait casser avec celui de tunerpage
-        
+    
+
     def run(self):
         tab = gen_frequences() #création du tableau des fréquences pour détection de la note
 
@@ -49,9 +55,6 @@ class Partition(threading.Thread):
         #instrument cible : clarinette -> dernière octave utilisée : 5ème (2kHz) => Théorème de Shannon : 2*2kHz
         chunk = 2048*2 #enregistrement en morceaux de x samples
         seconds = chunk/fs #analyse sur la durée d'un chunk pour analyser un chunk à la fois
-
-        #print("durée chunk:" , fs/chunk*seconds)
-
 
         while not self._stopevent.isSet():
             while self.enpause:
@@ -96,19 +99,24 @@ class Partition(threading.Thread):
 
             freq_in_hertz = abs(freq * frate)
             res=find_note(tab,freq_in_hertz)
-            print(find_Midi_Note(res[0]))
             tab_MIDI_song.append(find_Midi_Note(res[0]))
-            # print("code MIDI de ",res,": ",find_Midi_Note(res[0])) #TODO à supprimer : affichage du code midi pour chaque note entendue, ça marche bien
         
 
+    def lancer(self):
+        duree_noire = 60/int(self.ETempo.get())
+        print("duree noire : ",duree_noire)
+        global start #faire de start une variable globale
+        start = timer() #clock
+        self.enpause=False
+
     def pause(self):
-        """
-        TODO
-        D'après mes calculs sur la durée d'un chunk, 5 secondes d'enregistrement = 57 chunks
-        Dans les faits, 57 chunks = 10 secondes, pourquoi c'est seulement la moitié des chunks ?
-        """
+        global end #faire de end une variable globale
+        end = timer() #clock
+        duree = end - start
+        duree_chunk = duree/len(tab_MIDI_song) #durée d'un chunk
         print(tab_MIDI_song)
         print("taille :",len(tab_MIDI_song))
+        print(duree_chunk)
         self.enpause=True
         # create your MIDI object
         mf = MIDIFile(1)     # only 1 track
@@ -135,12 +143,6 @@ class Partition(threading.Thread):
         titre = self.ETitre.get()
         with open(titre+".mid", 'wb') as outf: #on écrit dans le fichier MIDI
             mf.writeFile(outf)
-        
-
-    def lancer(self):
-        self.enpause=False
-        #print(self.ETitre.get())
-        #print(self.ETempo.get()) #int(self.ETempo.get())  pour convertir en int
     
     
 
