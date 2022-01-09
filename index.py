@@ -2,6 +2,7 @@ import numpy as np
 from tkinter import *
 from tkinter import ttk
 from TunerPage import *
+import pyaudio
 from PartitionPage import Partition
 from accueil import Accueil
 
@@ -37,6 +38,7 @@ tuner.pack()
 partition.pack()
 frameBouton.pack()
 #Création des frames pour les différentes page que l'on ajoutera ou supprimera de la fenetre en fonction de la page demandée
+p = pyaudio.PyAudio() #Instanciation de PyAudio
 frameAccueil = Frame(fenetre)
 frameAccueil.config(background="WHITE")
 frameAccueil.pack()
@@ -44,10 +46,10 @@ a=Accueil(frameAccueil)
 a.start()
 frameTuner = Frame(fenetre)
 frameTuner.config(background="WHITE")
-t=Tuner(frameTuner)
+t=Tuner(frameTuner,p)
 t.start()
 framePartition = Frame(fenetre)
 framePartition.config(background="WHITE")
-p=Partition(framePartition)
+p=Partition(framePartition,p)
 p.start()
 fenetre.mainloop()

@@ -12,7 +12,7 @@ import os
 from midiutil.MidiFile import MIDIFile #TODO à mettre dans PartitionPage quand ce sera fait
 
 class Tuner(threading.Thread):
-    def __init__(self,fenetre):
+    def __init__(self,fenetre,p):
         threading.Thread.__init__(self)
         self._stopevent = threading.Event( )
         self.enpause=True #variable booleaine pour savoir si il faut stopper ou continuer le programme
@@ -45,6 +45,7 @@ class Tuner(threading.Thread):
         self.bouton_stop = Button(fenetre, text="stop", command=self.pause)#bouton pour stopper l'accordeur
         self.bouton_stop.pack()
         self.filename="output.wav" #nom du fichier temporaire ou est enregistré le son
+        self.p=p
 
     def run(self):
         tab = gen_frequences() #création du tableau des fréquences pour détection de la note
@@ -56,7 +57,6 @@ class Tuner(threading.Thread):
         chunk = 2048*2 #enregistrement en morceaux de x samples
         seconds = chunk/fs #analyse sur la durée d'un chunk pour analyser un chunk à la fois
 
-        p = pyaudio.PyAudio() #Instanciation de PyAudio
 
         while not self._stopevent.isSet():
             while self.enpause:
@@ -65,7 +65,7 @@ class Tuner(threading.Thread):
                 time.sleep(0.5)
                 
             #Ouverture du micro
-            stream = p.open(format=sample_format,
+            stream = self.p.open(format=sample_format,
                             channels=channels,
                             rate=fs,
                             frames_per_buffer=chunk,
@@ -81,7 +81,7 @@ class Tuner(threading.Thread):
             #Enregistrer dans le fichier externe
             wf = wave.open(self.filename, 'wb')
             wf.setnchannels(channels)
-            wf.setsampwidth(p.get_sample_size(sample_format))
+            wf.setsampwidth(self.p.get_sample_size(sample_format))
             wf.setframerate(fs)
             wf.writeframes(b''.join(frames))
             wf.close()
@@ -102,7 +102,7 @@ class Tuner(threading.Thread):
 
             freq_in_hertz = abs(freq * frate)
             res=find_note(tab,freq_in_hertz)
-            tab_MIDI_song.append(find_Midi_Note(res[0]))
+            # tab_MIDI_song.append(find_Midi_Note(res[0]))
             #print("code MIDI de ",res,": ",find_Midi_Note(res[0])) #TODO à supprimer : affichage du code midi pour chaque note entendue, ça marche bien
             notePrec = find_note(tab, freq_in_hertz/coeff_frequences) #nom de la note précédente #TODO ? juste limiter à notePrec[0] pour avoir que le nom (le reste sert à rien pour cette utilisation)
             noteSuiv = find_note(tab, freq_in_hertz*coeff_frequences) #nom de la note suivante
@@ -131,30 +131,30 @@ class Tuner(threading.Thread):
 
     def pause(self):
         self.enpause=True
-        # create your MIDI object
-        mf = MIDIFile(1)     # only 1 track
-        track = 0   # the only track
+        # # create your MIDI object
+        # mf = MIDIFile(1)     # only 1 track
+        # track = 0   # the only track
 
-        time = 0    # start at the beginning
-        mf.addTrackName(track, time, "Sample Track")
-        mf.addTempo(track, time, 200)
+        # time = 0    # start at the beginning
+        # mf.addTrackName(track, time, "Sample Track")
+        # mf.addTempo(track, time, 200)
 
-        # add some notes
-        channel = 0
-        volume = 100
+        # # add some notes
+        # channel = 0
+        # volume = 100
 
-        for i in range(len(tab_MIDI_song)):
-            if(tab_MIDI_song[i] == "-"): #si pas de note on laisse un silence
-                time+=1
-            else: #sinon on ajoute la note avec une durée de 1
-                pitch = int(tab_MIDI_song[i]) 
-                time+=1
-                duration = 1
-                mf.addNote(track, channel, pitch, time, duration, volume)
+        # for i in range(len(tab_MIDI_song)):
+        #     if(tab_MIDI_song[i] == "-"): #si pas de note on laisse un silence
+        #         time+=1
+        #     else: #sinon on ajoute la note avec une durée de 1
+        #         pitch = int(tab_MIDI_song[i]) 
+        #         time+=1
+        #         duration = 1
+        #         mf.addNote(track, channel, pitch, time, duration, volume)
 
-        # write it to disk
-        with open("output.mid", 'wb') as outf: #on écrit dans le fichier MIDI
-            mf.writeFile(outf)
+        # # write it to disk
+        # with open("output.mid", 'wb') as outf: #on écrit dans le fichier MIDI
+        #     mf.writeFile(outf)
         
 
     def lancer(self):
