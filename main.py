@@ -31,6 +31,15 @@ def aff(tab):
     for i in range(len(tab)):
         print("octave ",i," : ",tab[i])
 
+def find_Midi_Note(note): #trouver le code midi d'une note à partir de son nom
+    if(note=="-"): #cas ou aucune note n'est entendue, pas de code
+        return "-"
+    else:
+        octave = note[-1] #numéro d'octave
+        note = note.replace(octave,"") #nom de la note sans son octave
+        return tab_notes.index(note) + 24 + (int(octave)-1) * 12 #index de la note dans le tableau + 24 (tableau midi commençant à octave -1, nous à octave 1) + 12 (nb notes) * nb octaves - 1
+
+
 def find_note(frequences, note):
     i = 0
 
@@ -73,6 +82,9 @@ filename = "output.wav"
 
 p = pyaudio.PyAudio() #Instanciation de PyAudio
 
+#print(find_Midi_Note("Fa#5"))
+
+"""
 while True:
 
     #Ouverture du micro
@@ -120,3 +132,4 @@ while True:
 
 #TODO quand on aura une interface graphique : bouton pour lancer et terminer le record : 
 #quand record terminé, les analyses de frequences sont finies, on suppr le fichier output qui servait à trouver la freq
+"""

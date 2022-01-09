@@ -6,6 +6,7 @@ import numpy as np
 
 coeff_frequences = 233.08/220.0 
 tab_notes = ["Do", "Do#", "Re", "Mib", "Mi", "Fa", "Fa#", "Sol", "Sol#", "La", "Sib", "Si"]
+tab_MIDI_song = []
 
 nb_octaves = 7
 note_init = (32.7/coeff_frequences)
@@ -30,6 +31,15 @@ def gen_frequences():
 def aff(tab):
     for i in range(len(tab)):
         print("octave ",i," : ",tab[i])
+
+def find_Midi_Note(note): #trouver le code midi d'une note à partir de son nom
+    if(note=="-"): #cas ou aucune note n'est entendue, pas de code
+        return "-"
+    else:
+        octave = note[-1] #numéro d'octave
+        note = note.replace(octave,"") #nom de la note sans son octave
+        return tab_notes.index(note) + 24 + (int(octave)-1) * 12 #index de la note dans le tableau + 24 (tableau midi commençant à octave -1, nous à octave 1) + 12 (nb notes) * nb octaves - 1
+
 
 def find_note(frequences, note):
     i = 0

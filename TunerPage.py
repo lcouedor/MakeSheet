@@ -9,6 +9,7 @@ from tkinter import ttk
 import time
 from math import *
 import os
+from midiutil.MidiFile import MIDIFile #TODO à mettre dans PartitionPage quand ce sera fait
 
 class Tuner(threading.Thread):
     def __init__(self,fenetre):
@@ -101,11 +102,10 @@ class Tuner(threading.Thread):
 
             freq_in_hertz = abs(freq * frate)
             res=find_note(tab,freq_in_hertz)
+            tab_MIDI_song.append(find_Midi_Note(res[0]))
+            #print("code MIDI de ",res,": ",find_Midi_Note(res[0])) #TODO à supprimer : affichage du code midi pour chaque note entendue, ça marche bien
             notePrec = find_note(tab, freq_in_hertz/coeff_frequences) #nom de la note précédente #TODO ? juste limiter à notePrec[0] pour avoir que le nom (le reste sert à rien pour cette utilisation)
             noteSuiv = find_note(tab, freq_in_hertz*coeff_frequences) #nom de la note suivante
-            #TODO à supprimer après les tests
-            if(notePrec[0] != "-"):
-                print(notePrec[0])
             if(res[0]!='-'):
                 self.label["text"]="Note : ",res[0]
                 self.CAN_Zone.delete(self.CAN_aiguille,self.CAN_norm,self.CAN_Zone_Green,self.CAN_Zone_Red,self.CAN_Zone_Yellow,self.note,self.notePrec,self.noteSucc)#supprimer les formes du canva déjà existantes
@@ -131,6 +131,30 @@ class Tuner(threading.Thread):
 
     def pause(self):
         self.enpause=True
+        # create your MIDI object
+        mf = MIDIFile(1)     # only 1 track
+        track = 0   # the only track
+
+        time = 0    # start at the beginning
+        mf.addTrackName(track, time, "Sample Track")
+        mf.addTempo(track, time, 200)
+
+        # add some notes
+        channel = 0
+        volume = 100
+
+        for i in range(len(tab_MIDI_song)):
+            if(tab_MIDI_song[i] == "-"): #si pas de note on laisse un silence
+                time+=1
+            else: #sinon on ajoute la note avec une durée de 1
+                pitch = int(tab_MIDI_song[i]) 
+                time+=1
+                duration = 1
+                mf.addNote(track, channel, pitch, time, duration, volume)
+
+        # write it to disk
+        with open("output.mid", 'wb') as outf: #on écrit dans le fichier MIDI
+            mf.writeFile(outf)
         
 
     def lancer(self):
