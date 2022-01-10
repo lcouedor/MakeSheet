@@ -9,11 +9,18 @@ from tkinter import ttk
 import time
 from math import *
 import os
-from midiutil.MidiFile import MIDIFile #TODO à mettre dans PartitionPage quand ce sera 
+from midiutil.MidiFile import MIDIFile, TimeSignature #TODO à mettre dans PartitionPage quand ce sera 
 from timeit import default_timer as timer
 
 def only_numbers(char):
     return char.isdigit()
+
+def titreValide(char):
+    #TODO faire test de la longueur du titre, titre entier différents de . ou .. 
+    test = True
+    if(char=="<" or char==">" or char==":" or char=='"' or char=="/" or char=="\\" or char=="|" or char=="?" or char=="*") :
+        test=False
+    return test
 
 start = 0
 end = 0
@@ -30,10 +37,15 @@ class Partition(threading.Thread):
         self.label.config(background="WHITE")
         self.label.pack()
         self.validation = fenetre.register(only_numbers)
+        self.validationTitre = fenetre.register(titreValide)
         self.LabelTitre = Label(fenetre, text="Titre")
         self.LabelTitre.pack()
-        self.ETitre = Entry(fenetre)
+        self.ETitre = Entry(fenetre,validate="key", validatecommand=(self.validationTitre, '%S'))
         self.ETitre.pack()
+        self.erreur = Label(self.fenetre) #correspond au label qui affiche la note
+        self.erreur["text"]=""
+        self.erreur.config(background="WHITE")
+        self.erreur.pack()
         self.LabelTempo = Label(fenetre, text="Tempo")
         self.LabelTempo.pack()
         self.ETempo = Entry(fenetre,validate="key", validatecommand=(self.validation, '%S'))
@@ -103,47 +115,53 @@ class Partition(threading.Thread):
         
 
     def lancer(self):
-        duree_noire = 60/int(self.ETempo.get())
-        print("duree noire : ",duree_noire)
-        global start #faire de start une variable globale
-        start = timer() #clock
-        self.enpause=False
+        if (self.enpause==True):
+            if(self.ETitre.get()!="." and self.ETitre.get()!=".." and self.ETitre.get()!="" and self.ETempo.get()!=""):
+                duree_noire = 60/int(self.ETempo.get())
+                print("duree noire : ",duree_noire)
+                global start #faire de start une variable globale
+                start = timer() #clock
+                self.erreur["text"]=""
+                self.enpause=False
+            else :
+                self.erreur["text"]="Erreur du titre ou du tempo"
 
     def pause(self):
-        global end #faire de end une variable globale
-        end = timer() #clock
-        duree = end - start
-        duree_chunk = duree/len(tab_MIDI_song) #durée d'un chunk
-        print(tab_MIDI_song)
-        print("taille :",len(tab_MIDI_song))
-        print(duree_chunk)
-        self.enpause=True
-        # create your MIDI object
-        mf = MIDIFile(1)     # only 1 track
-        track = 0   # the only track
+        if (self.enpause==False):
+            global end #faire de end une variable globale
+            end = timer() #clock
+            duree = end - start
+            duree_chunk = duree/len(tab_MIDI_song) #durée d'un chunk
+            print(tab_MIDI_song)
+            print("taille :",len(tab_MIDI_song))
+            print(duree_chunk)
+            self.enpause=True
+            # create your MIDI object
+            mf = MIDIFile(1)     # only 1 track
+            track = 0   # the only track
 
-        time = 0    # start at the beginning
-        mf.addTrackName(track, time, "Sample Track")
-        mf.addTempo(track, time, int(self.ETempo.get()))
+            time = 0    # start at the beginning
+            mf.addTrackName(track, time, "Sample Track")
+            mf.addTempo(track, time, int(self.ETempo.get()))
 
-        # add some notes
-        channel = 0
-        volume = 100
+            # add some notes
+            channel = 0
+            volume = 100
 
-        for i in range(len(tab_MIDI_song)):
-            if(tab_MIDI_song[i] == "-"): #si pas de note on laisse un silence
-                time+=1
-            else: #sinon on ajoute la note avec une durée de 1
-                pitch = int(tab_MIDI_song[i]) 
-                time+=1
-                duration = 1
-                mf.addNote(track, channel, pitch, time, duration, volume)
+            for i in range(len(tab_MIDI_song)):
+                if(tab_MIDI_song[i] == "-"): #si pas de note on laisse un silence
+                    time+=1
+                else: #sinon on ajoute la note avec une durée de 1
+                    pitch = int(tab_MIDI_song[i]) 
+                    time+=1
+                    duration = 1
+                    mf.addNote(track, channel, pitch, time, duration, volume)
 
-        # write it to disk
-        titre = self.ETitre.get()
-        with open(titre+".mid", 'wb') as outf: #on écrit dans le fichier MIDI
-            mf.writeFile(outf)
-    
+            # write it to disk
+            titre = self.ETitre.get()
+            with open(titre+".mid", 'wb') as outf: #on écrit dans le fichier MIDI
+                mf.writeFile(outf)
+        
     
 
 
