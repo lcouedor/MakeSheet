@@ -1,6 +1,4 @@
-import numpy as np
 from tkinter import *
-from tkinter import ttk
 from TunerPage import *
 import pyaudio
 from PartitionPage import Partition

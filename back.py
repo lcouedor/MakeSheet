@@ -1,12 +1,6 @@
-#from os import close
-import pyaudio
-import wave
-import soundfile
-import numpy as np
-
-coeff_frequences = 233.08/220.0 
-tab_notes = ["Do", "Do#", "Re", "Mib", "Mi", "Fa", "Fa#", "Sol", "Sol#", "La", "Sib", "Si"]
-tab_MIDI_song = []
+coeff_frequences = 233.08/220.0 #coefficient multiplicateur pour tableau de fréquences
+tab_notes = ["Do", "Do#", "Re", "Mib", "Mi", "Fa", "Fa#", "Sol", "Sol#", "La", "Sib", "Si"] #tableau des notes
+tab_MIDI_song = [] #tableau de tous les codes midi
 
 nb_octaves = 7
 note_init = (32.7/coeff_frequences)
@@ -38,8 +32,63 @@ def find_Midi_Note(note): #trouver le code midi d'une note à partir de son nom
     else:
         octave = note[-1] #numéro d'octave
         note = note.replace(octave,"") #nom de la note sans son octave
-        return tab_notes.index(note) + 24 + (int(octave)-1) * 12 #index de la note dans le tableau + 24 (tableau midi commençant à octave -1, nous à octave 1) + 12 (nb notes) * nb octaves - 1
+        return tab_notes.index(note) + 24 + (int(octave)) * 12 #index de la note dans le tableau + 24 (tableau midi commençant à octave -1, nous à octave 1) + 12 (nb notes) * nb octaves - 1
 
+def arrange_MIDI(): #remplir les tableaux tab_notes_MIDI et tab_coeff_MIDI
+    #TODO optimiser la fonction. Avec les noms des variables c'est n'importe quoi
+
+    newTab_coeff_MIDI = []
+    newTab_notes_MIDI = []
+
+    max = len(tab_MIDI_song) #taille du tableau des notes MIDI
+    if(max > 0): #ajout de la premiere note si elle existe
+        newTab_notes_MIDI.append(tab_MIDI_song[0])
+        newTab_coeff_MIDI.append(1)
+    else: return #sinon tableau vide on return
+
+    #on remplit les tableaux de notes et de coefficients
+    for i in range (max-1): #parcours des valeurs du tableau MIDI -1 pour éviter le out of bounds
+        if(tab_MIDI_song[i] == tab_MIDI_song[i+1]): #si deux caracteres consécutifs identiques on incrémente le coeff
+            newTab_coeff_MIDI[len(newTab_coeff_MIDI)-1] += 1
+        else: #sinon on ajoute la note qui n'y est pas et on lui créé un coeff à 1
+            newTab_notes_MIDI.append(tab_MIDI_song[i+1])
+            newTab_coeff_MIDI.append(1)
+
+    #on évite les notes parasytes en supprimant ce qui n'apparait que sur un seul chunk
+    new2Tab_coeff_MIDI = []
+    new2Tab_notes_MIDI = []
+    for i in range (len(newTab_coeff_MIDI)):
+        if(newTab_coeff_MIDI[i] > 1):
+            new2Tab_coeff_MIDI.append(newTab_coeff_MIDI[i])
+            new2Tab_notes_MIDI.append(newTab_notes_MIDI[i])
+
+    #On concatène à nouveau dans le cas ou un note parasyte était venue couper la série de notes
+    new3Tab_coeff_MIDI = []
+    new3Tab_notes_MIDI = []
+
+    max = len(new2Tab_notes_MIDI) #taille du tableau des notes MIDI
+    if(max > 0): #ajout de la premiere note si elle existe
+        new3Tab_notes_MIDI.append(new2Tab_notes_MIDI[0])
+        new3Tab_coeff_MIDI.append(new2Tab_coeff_MIDI[0])
+    else: return #sinon tableau vide on return
+
+    #on remplit les tableaux de notes et de coefficients
+    for i in range (max-1): #parcours des valeurs du tableau MIDI -1 pour éviter le out of bounds
+        if(new2Tab_notes_MIDI[i] == new2Tab_notes_MIDI[i+1]): #si deux caracteres consécutifs identiques on incrémente le coeff
+            new3Tab_coeff_MIDI[len(new3Tab_coeff_MIDI)-1] += new2Tab_coeff_MIDI[i+1]
+        else: #sinon on ajoute la note qui n'y est pas et on lui créé un coeff à 1
+            new3Tab_notes_MIDI.append(new2Tab_notes_MIDI[i+1])
+            new3Tab_coeff_MIDI.append(new2Tab_coeff_MIDI[i+1])
+
+    #si il y a du silence au début : le supprime
+    if(new3Tab_notes_MIDI[0] == "-"):
+        new3Tab_notes_MIDI.pop(0)
+        new3Tab_coeff_MIDI.pop(0)
+
+    #mettre les tableaux temporaires dans les variables utilisées ailleurs
+    tab_notes_MIDI = new3Tab_notes_MIDI
+    tab_coeff_MIDI = new3Tab_coeff_MIDI
+    return (tab_coeff_MIDI,tab_notes_MIDI)
 
 def find_note(frequences, note):
     i = 0
@@ -53,16 +102,16 @@ def find_note(frequences, note):
     #TODO param crash freq trop grande
     if(note>frequences[nb_octaves-1][tab_notes[len(tab_notes) -1]]) : return ((str(tab_notes[len(tab_notes) - 1])+str(nb_octaves-1)),frequences[nb_octaves-1][tab_notes[len(tab_notes) -1]],round(frequences[nb_octaves-1][tab_notes[len(tab_notes) -1]]/coeff_frequences,2),round(frequences[nb_octaves-1][tab_notes[len(tab_notes) -1]]*coeff_frequences,2),(100 - (frequences[nb_octaves-1][tab_notes[len(tab_notes) -1]]*100 / note)))
 
-    #comparaison du while : entre la première valeur de l'octave (le do) et celle de l'octave suivante (peut importe s'il existe ou non dans le tableau)
+    #comparaison du while : entre la premiere valeur de l'octave (le do) et celle de l'octave suivante (peut importe s'il existe ou non dans le tableau)
     while not(note>=frequences[i][tab_notes[0]] and note<=frequences[i][tab_notes[0]]*2): #trouver la bonne octave
         i = i+1
         #TODO est ce que j'ai vraiment besoin de cette condition ?
-        if(i==len(frequences)): #note non présente dans le tableau des fréquences (comparativement au paramètre nombre d'octave)
+        if(i==len(frequences)): #note non présente dans le tableau des fréquences (comparativement au parametre nombre d'octave)
             return ("-",0,0,0,0)
     #l'octave a été trouvée
     octave = list(frequences[i].values()) #transformer le tableau dict en list de fréquences
 
-    #cas où la fréquence recherchée est entre la dernière valeur d'une octave et la première de l'octave suivante
+    #cas où la fréquence recherchée est entre la derniere valeur d'une octave et la premiere de l'octave suivante
     if(note>octave[len(tab_notes)-1] + (octave[len(tab_notes)-1]*coeff_frequences - octave[len(tab_notes)-1])/2): return ((str(tab_notes[0])+str(i+1)),frequences[i+1][tab_notes[0]],frequences[i][tab_notes[len(tab_notes) -1]],frequences[i+1][tab_notes[1]],(100 - (frequences[i+1][tab_notes[0]]*100 / note))) 
 
     #trouver la note jouée

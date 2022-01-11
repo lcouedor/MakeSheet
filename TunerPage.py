@@ -5,11 +5,9 @@ import soundfile
 import numpy as np
 from back import *
 from tkinter import *
-from tkinter import ttk
 import time
 from math import *
 import os
-from midiutil.MidiFile import MIDIFile #TODO à mettre dans PartitionPage quand ce sera fait
 
 class Tuner(threading.Thread):
     def __init__(self,fenetre,p):
