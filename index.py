@@ -8,6 +8,7 @@ def TunerPageFct():
     frameAccueil.pack_forget()
     framePartition.pack_forget()
     frameTuner.pack()
+    p.pause()
         
 def PartitionPageFct():
     frameAccueil.pack_forget()
@@ -20,6 +21,7 @@ def AccueilPageFct():
     frameTuner.pack_forget()
     frameAccueil.pack()
     t.pause()
+    p.pause()
 
 
 fenetre = Tk()#Création de la fenêtre 

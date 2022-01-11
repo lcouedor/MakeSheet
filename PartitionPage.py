@@ -53,10 +53,12 @@ class Partition(threading.Thread):
         self.bouton_stop = Button(fenetre, text="stop", command=self.pause)#bouton pour stopper l'accordeur
         self.bouton_stop.pack()
         self.p=p
-        self.filename="output2.wav" #nom du fichier temporaire ou est enregistré le son #TODO nom de fichier fait casser avec celui de tunerpage
+        self.filename="output.wav" #nom du fichier temporaire ou est enregistré le son #TODO nom de fichier fait casser avec celui de tunerpage
     
 
     def run(self):
+        if os.path.exists(self.filename):
+                    os.remove(self.filename) #supprime le fichier temporaire
         tab = gen_frequences() #création du tableau des fréquences pour détection de la note
 
         sample_format = pyaudio.paInt16  # 16 bits per sample
@@ -68,6 +70,8 @@ class Partition(threading.Thread):
 
         while not self._stopevent.isSet():
             while self.enpause:
+                if os.path.exists(self.filename):
+                    os.remove(self.filename) #supprime le fichier temporaire
                 time.sleep(0.5)
                 
             #Ouverture du micro
@@ -94,7 +98,7 @@ class Partition(threading.Thread):
             wf.close()
 
             #Main frequency of a given file
-            file_path = "output2.wav"
+            file_path = "output.wav"
             data, frate  = soundfile.read(file_path, dtype='int16')
             data_size = len(data)
 

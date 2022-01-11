@@ -46,6 +46,8 @@ class Tuner(threading.Thread):
         self.p=p
 
     def run(self):
+        if os.path.exists(self.filename):
+                    os.remove(self.filename) #supprime le fichier temporaire
         tab = gen_frequences() #création du tableau des fréquences pour détection de la note
 
         sample_format = pyaudio.paInt16  # 16 bits per sample
