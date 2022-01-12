@@ -49,7 +49,7 @@ class Chrono():
             
             self.t.set(self.d)
             if(self.count==0):
-                self.root.after(930,self.timerChrono)
+                self.root.after(1000,self.timerChrono)
             
         
     def __init__(self, fenetre):
