@@ -11,6 +11,7 @@ import os
 from midiutil.MidiFile import MIDIFile
 from timeit import default_timer as timer
 from music21 import converter, instrument
+from chrono import * 
 
 def only_numbers(char):
     return char.isdigit()
@@ -48,17 +49,16 @@ class Partition(threading.Thread):
         self.LabelTempo.pack()
         self.ETempo = Entry(fenetre,validate="key", validatecommand=(self.validation, '%S'))
         self.ETempo.pack()
+        self.chrono=Chrono(self.fenetre)
         self.bouton_lancer = Button(fenetre, text="Lancer", command=self.lancer) #bouton pour lancer l'accordeur
         self.bouton_lancer.pack()
         self.bouton_stop = Button(fenetre, text="stop", command=self.pause)#bouton pour stopper l'accordeur
         self.bouton_stop.pack()
         self.p=p
         self.filename="output.wav" #nom du fichier temporaire ou est enregistré le son #TODO nom de fichier fait casser avec celui de tunerpage
-    
+        self.rm=0
 
     def run(self):
-        if os.path.exists(self.filename):
-                    os.remove(self.filename) #supprime le fichier temporaire
         tab = gen_frequences() #création du tableau des fréquences pour détection de la note
 
         sample_format = pyaudio.paInt16  # 16 bits per sample
@@ -70,10 +70,11 @@ class Partition(threading.Thread):
 
         while not self._stopevent.isSet():
             while self.enpause:
-                if os.path.exists(self.filename):
+                if os.path.exists(self.filename) and self.rm==1 :
                     os.remove(self.filename) #supprime le fichier temporaire
+                    self.rm=0
                 time.sleep(0.5)
-                
+            
             #Ouverture du micro
             stream = self.p.open(format=sample_format,
                             channels=channels,
@@ -125,6 +126,7 @@ class Partition(threading.Thread):
                 start = timer() #clock
                 self.erreur["text"]=""
                 self.enpause=False
+                self.chrono.startChrono()
             else :
                 self.erreur["text"]="Erreur du titre ou du tempo"
 
@@ -132,10 +134,12 @@ class Partition(threading.Thread):
         duree_noire = 60/int(self.ETempo.get())
         if (self.enpause==False):
             self.enpause=True
+            self.rm=1
             global end #faire de end une variable globale
             end = timer() #clock
             duree = end - start
-
+            self.chrono.stopChrono()
+            self.chrono.resetChrono()
             if(duree < 3):
                 print("duree inférieure à 3 secondes, temps insuffisant")
                 return
