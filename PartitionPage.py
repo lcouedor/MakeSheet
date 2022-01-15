@@ -131,56 +131,60 @@ class Partition(threading.Thread):
                 self.erreur["text"]="Erreur du titre ou du tempo"
 
     def pause(self):
-        duree_noire = 60/int(self.ETempo.get())
-        if (self.enpause==False):
-            self.enpause=True
-            self.rm=1
-            global end #faire de end une variable globale
-            end = timer() #clock
-            duree = end - start
-            self.chrono.stopChrono()
-            self.chrono.resetChrono()
-            if(duree < 3):
-                print("duree inférieure à 3 secondes, temps insuffisant")
-                return
+        if(self.ETempo.get()!=""):
+            duree_noire = 60/int(self.ETempo.get())
+            if (self.enpause==False):
+                self.enpause=True
+                self.rm=1
+                global end #faire de end une variable globale
+                end = timer() #clock
+                duree = end - start
+                self.chrono.stopChrono()
+                self.chrono.resetChrono()
+                if(duree < 3):
+                    print("duree inférieure à 3 secondes, temps insuffisant")
+                    return
 
-            if(len(tab_MIDI_song) !=0):
-                duree_chunk = duree/len(tab_MIDI_song) #durée d'un chunk
-                #print(duree_chunk)
-            else:
-                print("erreur notes non enregistrées")
-                return
+                if(len(tab_MIDI_song) !=0):
+                    duree_chunk = duree/len(tab_MIDI_song) #durée d'un chunk
+                    #print(duree_chunk)
+                else:
+                    print("erreur notes non enregistrées")
+                    return
 
-            print("tableau midi : ",tab_MIDI_song)
-            (tab_coeff_MIDI,tab_notes_MIDI)=arrange_MIDI()
-            print(tab_notes_MIDI)
-            print(tab_coeff_MIDI)
-            
-            #Création du fichier Midi
-            mf = MIDIFile(1) #MidiFile à une portée
-            track = 0 #définition de la portée de référence
+                print("tableau midi : ",tab_MIDI_song)
+                (tab_coeff_MIDI,tab_notes_MIDI)=arrange_MIDI()
+                print(tab_notes_MIDI)
+                print(tab_coeff_MIDI)
+                
+                #Création du fichier Midi
+                mf = MIDIFile(1) #MidiFile à une portée
+                track = 0 #définition de la portée de référence
 
-            time = 0 #temps de départ
-            mf.addTrackName(track, time, "Sample Track")
-            mf.addTempo(track, time, int(self.ETempo.get()))
+                time = 0 #temps de départ
+                mf.addTrackName(track, time, "Sample Track")
+                mf.addTempo(track, time, int(self.ETempo.get()))
 
-            channel = 0
-            volume = 100
+                channel = 0
+                volume = 100
 
-            for i in range(len(tab_notes_MIDI)): #Parcours des notes de tab_MIDI_song
-                if(tab_notes_MIDI[i] == "-"): #Si pas de note on laisse un silence
-                    time+=(tab_coeff_MIDI[i]*duree_chunk)/duree_noire
-                else: #Sinon on ajoute la note avec une durée de 1
-                    pitch = int(tab_notes_MIDI[i]) 
-                    duration = (tab_coeff_MIDI[i]*duree_chunk)/duree_noire
-                    time+=duration
-                    mf.addNote(track, channel, pitch, time, duration, volume)
+                for i in range(len(tab_notes_MIDI)): #Parcours des notes de tab_MIDI_song
+                    if(tab_notes_MIDI[i] == "-"): #Si pas de note on laisse un silence
+                        time+=(tab_coeff_MIDI[i]*duree_chunk)/duree_noire
+                    else: #Sinon on ajoute la note avec une durée de 1
+                        pitch = int(tab_notes_MIDI[i]) 
+                        duration = (tab_coeff_MIDI[i]*duree_chunk)/duree_noire
+                        time+=duration
+                        mf.addNote(track, channel, pitch, time, duration, volume)
 
-            #Ecrire sur le fichier MIDI 
-            titre = self.ETitre.get()
-            with open(titre+".mid", 'wb') as outf: #dans cette version le arrange_MIDI ne casse pas mais ça oui
-                mf.writeFile(outf)  
+                #Ecrire sur le fichier MIDI 
+                titre = self.ETitre.get()
+                with open(titre+".mid", 'wb') as outf: #dans cette version le arrange_MIDI ne casse pas mais ça oui
+                    mf.writeFile(outf)  
 
-            mf.close()
+                mf.close()
+        else :
+            if (self.enpause==False):
+                self.enpause=True
 
 

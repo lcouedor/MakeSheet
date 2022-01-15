@@ -6,6 +6,8 @@ nb_octaves = 7
 note_init = (32.7/coeff_frequences)
 ecart = 0 #variable pour donner en % l'écart à la fréquence de la note la plus proche
 
+
+
 def gen_octave(base_note):
     tab_octave = dict()
     for i in range(len(tab_notes)):
