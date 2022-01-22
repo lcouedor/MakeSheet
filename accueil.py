@@ -16,7 +16,9 @@ class Accueil():
         self.label.config(background="WHITE")
         self.label.pack()
         self.fichier.pack()
+        self.fichier.config(background="WHITE")
         self.museScore.pack()
+        self.museScore.config(background="WHITE")
         self.pa=pa
     
     def miseAjour(self):
