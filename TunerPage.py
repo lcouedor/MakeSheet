@@ -15,36 +15,61 @@ class Tuner(threading.Thread):
         self._stopevent = threading.Event( )
         self.enpause=True #variable booleaine pour savoir si il faut stopper ou continuer le programme
         self.fenetre=fenetre #correspond à la fenetre de la page du tunner
-        self.label = Label(self.fenetre) #correspond au label qui affiche la note
-        self.label["text"]=""
-        self.label.config(background="WHITE")
+        self.label = Label(self.fenetre) 
+        self.label["text"]="Tunner"
+        self.label.config(background="#D9D9D9", font=30)
         self.debTot=0 #variable qui contient la fréquence de la note précédente
         self.finTot=0 #variable qui contient la fréquence de la note suivante
         self.finNote=0 #variable qui contient la fréquence de la fin de l'intervalle des fréquences pour la note 
         self.debNote=0 #variable qui contient la fréquence de le début de l'intervalle des fréquences pour la note 
         self.ecart = Label(self.fenetre)#correspond au label qui affiche l'écart entre la fréquence de la note et la fréquence obtenue
         self.ecart["text"]=""
-        self.ecart.config(background="WHITE")
-        self.label.pack()
-        self.ecart.pack()
-        self.CAN_Zone = Canvas ( self.fenetre , bg = "white" , height = 350 , width = 1080 ) #canva qui va contenir le compteur
-        self.CAN_Zone.pack()
+        self.ecart.config(background="#D9D9D9")
+        self.label.grid(row=0,column=1)
+        self.ecart.grid(row=1,column=1)
+        self.CAN_Zone = Canvas ( self.fenetre , bg = "#D9D9D9" , height = 395 , width = 540, bd=0, highlightthickness=0 ) #canva qui va contenir le compteur
+        self.CAN_Zone.grid(row=2,column=1)
         self.CAN_Zone_Total = self.CAN_Zone.create_arc ( 20 , 20 , 520 , 520 , start = 0 , extent = 180 , fill = "#CCD1D1",outline="" )#arc de cercle corresponant à la totalité du compteur
         self.CAN_Zone_Red = self.CAN_Zone.create_arc ( 20 , 20 , 520 , 520 , start=0, extent =0, fill = "#F0B27A",outline="")#arc de cercle corresponant à la partie avant l'intervalle de la note
         self.CAN_Zone_Green = self.CAN_Zone.create_arc ( 20 , 20 , 520 , 520   , start=0, extent =0, fill = "#82E0AA",outline="")#arc de cercle corresponant à l'intervalle de la note
         self.CAN_Zone_Yellow = self.CAN_Zone.create_arc ( 20 , 20 , 520 , 520  , start=0, extent =0, fill = "#F4D03F",outline="")#arc de cercle corresponant à la partie après l'intervalle de la note
         self.CAN_aiguille =0 #aiguille du compteur
         self.CAN_norm =0 #segment correspondant à la fréquence de la note
+        self.legendeNote=self.CAN_Zone.create_text(60, 320, anchor="w",text ="Interval de la note" )
+        self.rectangleNote=self.CAN_Zone.create_rectangle(10,310,40,330, fill = "#82E0AA")
+        self.legendeNotePrec=self.CAN_Zone.create_text(60, 350, anchor="w",text = "Interval de la note précédente" )
+        self.rectangleNote=self.CAN_Zone.create_rectangle(10,340,40,360,fill = "#F0B27A")
+        self.legendeNoteSucc=self.CAN_Zone.create_text(60, 380,anchor="w",text = "Interval de la note suivante" )
+        self.rectangleNote=self.CAN_Zone.create_rectangle(10,370,40,390, fill = "#F4D03F")
         self.note=0 #texte dans le canva affichant la note
         self.notePrec=0 #texte dans le canva affichant la note précéente
         self.noteSucc=0 #texte dans le canva affichant la note suivante
-        self.bouton_lancer = Button(fenetre, text="Lancer", command=self.lancer) #bouton pour lancer l'accordeur
-        self.bouton_lancer.pack()
-        self.bouton_stop = Button(fenetre, text="stop", command=self.pause)#bouton pour stopper l'accordeur
-        self.bouton_stop.pack()
+        self.frameBouton= Frame(fenetre)
+        self.frameBouton.config(background="#D9D9D9")
+        self.bouton_lancer = Button(self.frameBouton, text="Lancer", command=self.lancer, background="WHITE", fg="#B38C30") #bouton pour lancer l'accordeur
+        self.bouton_lancer.grid(row=1,column=0)
+        self.bouton_stop = Button(self.frameBouton, text="Stop", command=self.pause, background="#B38C30", fg="WHITE")#bouton pour stopper l'accordeur
+        self.bouton_stop.grid(row=1,column=2)
+        self.vide=Label(self.frameBouton)
+        self.vide["text"]= "      "
+        self.vide.config(background="#D9D9D9")
+        self.vide.grid(row=1,column=1)
+        self.frameBouton.grid(row=3,column=1)
         self.filename="output.wav" #nom du fichier temporaire ou est enregistré le son
         self.p=p
         self.rm=0
+        self.fenetre.grid_columnconfigure(0,weight=1)
+        self.fenetre.grid_columnconfigure(1,weight=1)
+        self.fenetre.grid_columnconfigure(2,weight=1)
+        self.fenetre.grid_rowconfigure(0,weight=1)
+        self.fenetre.grid_rowconfigure(1,weight=1)
+        self.fenetre.grid_rowconfigure(2,weight=1)
+        self.fenetre.grid_rowconfigure(3,weight=1)
+        self.fenetre.grid_rowconfigure(4,weight=1)
+        self.fenetre.grid_rowconfigure(5,weight=1)
+        self.frameBouton.grid_columnconfigure(0,weight=2)
+        self.frameBouton.grid_columnconfigure(1,weight=1)
+        self.frameBouton.grid_columnconfigure(2,weight=2)
 
     def run(self):
         tab = gen_frequences() #création du tableau des fréquences pour détection de la note
@@ -106,7 +131,6 @@ class Tuner(threading.Thread):
             notePrec = find_note(tab, freq_in_hertz/coeff_frequences) #nom de la note précédente #TODO ? juste limiter à notePrec[0] pour avoir que le nom (le reste sert à rien pour cette utilisation)
             noteSuiv = find_note(tab, freq_in_hertz*coeff_frequences) #nom de la note suivante
             if(res[0]!='-'):
-                self.label["text"]="Note : ",res[0]
                 self.CAN_Zone.delete(self.CAN_aiguille,self.CAN_norm,self.CAN_Zone_Green,self.CAN_Zone_Red,self.CAN_Zone_Yellow,self.note,self.notePrec,self.noteSucc)#supprimer les formes du canva déjà existantes
                 self.debTot=res[2]
                 self.finTot=res[3]
@@ -129,11 +153,15 @@ class Tuner(threading.Thread):
             
 
     def pause(self):
+        self.bouton_lancer.config(background="WHITE", fg="#B38C30")
+        self.bouton_stop.config(background="#B38C30", fg="WHITE")
         self.enpause=True
         self.rm=1
         
 
     def lancer(self):
+        self.bouton_lancer.config(background="#B38C30", fg="WHITE")
+        self.bouton_stop.config(background="WHITE", fg="#B38C30")
         self.enpause=False
     
 

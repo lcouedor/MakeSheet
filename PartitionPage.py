@@ -1,3 +1,4 @@
+from distutils import extension
 import threading
 import pyaudio
 import wave
@@ -32,31 +33,75 @@ class Partition(threading.Thread):
         self.enpause=True #variable booleaine pour savoir si il faut stopper ou continuer le programme
         self.fenetre=fenetre #correspond à la fenetre de la page du tunner
         self.label = Label(self.fenetre) #correspond au label qui affiche la note
-        self.label["text"]="fenetre"
-        self.label.config(background="WHITE")
-        self.label.pack()
+        self.label["text"]="Partition"
+        self.label.config(background="#D9D9D9", font=30)
+        self.label.grid(row=0,column=0,sticky='N')
         self.validation = fenetre.register(only_numbers)
         self.validationTitre = fenetre.register(titreValide)
-        self.LabelTitre = Label(fenetre, text="Titre")
-        self.LabelTitre.pack()
-        self.ETitre = Entry(fenetre,validate="key", validatecommand=(self.validationTitre, '%S'))
-        self.ETitre.pack()
-        self.erreur = Label(self.fenetre) #correspond au label qui affiche la note
+        self.frameTot= Frame(fenetre)
+        self.frameTot.config(background="#D9D9D9")
+        self.frameParametres= Frame(self.frameTot)
+        self.frameParametres.config(background="#D9D9D9")
+        self.LabelTitre = Label(self.frameParametres, text="Titre")
+        self.LabelTitre.grid(row=0, column=0)
+        self.LabelTitre.config(background="#D9D9D9")
+        self.ETitre = Entry(self.frameParametres,validate="key", validatecommand=(self.validationTitre, '%S'))
+        self.ETitre.grid(row=0, column=1)
+        self.erreur = Label(self.frameParametres) #correspond au label qui affiche la note
         self.erreur["text"]=""
-        self.erreur.config(background="WHITE")
-        self.erreur.pack()
-        self.LabelTempo = Label(fenetre, text="Tempo")
-        self.LabelTempo.pack()
-        self.ETempo = Entry(fenetre,validate="key", validatecommand=(self.validation, '%S'))
-        self.ETempo.pack()
-        self.chrono=Chrono(self.fenetre)
-        self.bouton_lancer = Button(fenetre, text="Lancer", command=self.lancer) #bouton pour lancer l'accordeur
-        self.bouton_lancer.pack()
-        self.bouton_stop = Button(fenetre, text="stop", command=self.pause)#bouton pour stopper l'accordeur
-        self.bouton_stop.pack()
+        self.erreur.config(background="#D9D9D9",fg="RED")
+        self.erreur.grid(row=3, column=1)
+        self.LabelTempo = Label(self.frameParametres, text="Tempo")
+        self.LabelTempo.grid(row=1, column=0)
+        self.LabelTempo.config(background="#D9D9D9")
+        self.ETempo = Entry(self.frameParametres,validate="key", validatecommand=(self.validation, '%S'))
+        self.ETempo.grid(row=1, column=1)
+        self.LabelExtension=Label(self.frameParametres) #correspond au label qui affiche la note
+        self.LabelExtension["text"]="Le ou les types de fichier(s) : "
+        self.LabelExtension.grid(row=2,column=0)
+        self.LabelExtension.config(background="#D9D9D9")
+        self.frameCheck= Frame(self.frameParametres)
+        self.frameCheck.config(background="#D9D9D9")
+        self.extension1 = IntVar()
+        self.checkButton1=Checkbutton(self.frameCheck, text="MIDI", variable=self.extension1,onvalue=1, offvalue=0)
+        self.extension2 = IntVar()
+        self.checkButton2=Checkbutton(self.frameCheck, text="PARTITION", variable=self.extension2,onvalue=1, offvalue=0)
+        self.checkButton1.grid(row=0,column=1)
+        self.checkButton1.config(background="#D9D9D9")
+        self.checkButton2.grid(row=0,column=2)
+        self.checkButton2.config(background="#D9D9D9")
+        self.frameCheck.grid(row=2,column=1)
+        self.frameParametres.grid(row=0,column=0,sticky='NS')
+        self.chrono=Chrono(self.frameTot)
+        self.frameTot.grid(row=1,column=0,sticky='WENS')
+        self.frameBouton= Frame(fenetre)
+        self.frameBouton.config(background="#D9D9D9")
+        self.bouton_lancer = Button(self.frameBouton, text="Lancer", command=self.lancer,background="WHITE", fg="#B38C30") #bouton pour lancer l'accordeur
+        self.bouton_lancer.grid(row=1,column=0)
+        self.bouton_stop = Button(self.frameBouton, text="Stop", command=self.pause, background="#B38C30", fg="WHITE")#bouton pour stopper l'accordeur
+        self.bouton_stop.grid(row=1,column=2)
+        self.vide=Label(self.frameBouton)
+        self.vide["text"]= "      "
+        self.vide.config(background="#D9D9D9")
+        self.vide.grid(row=1,column=1)
+        self.frameBouton.grid(row=2,column=0)
         self.p=p
         self.filename="output.wav" #nom du fichier temporaire ou est enregistré le son #TODO nom de fichier fait casser avec celui de tunerpage
         self.rm=0
+        self.frameParametres.grid(padx=30, pady=0)
+        self.label.grid(padx=0, pady=20)
+        self.fenetre.grid_rowconfigure(1,weight=1)
+        self.fenetre.grid_rowconfigure(2,weight=1)
+        self.fenetre.grid_columnconfigure(0,weight=1)
+        self.frameParametres.grid_rowconfigure(0,weight=1)
+        self.frameParametres.grid_rowconfigure(1,weight=1)
+        self.frameParametres.grid_rowconfigure(2,weight=1)
+        self.frameTot.grid_columnconfigure(0,weight=1)
+        self.frameTot.grid_columnconfigure(1,weight=1)
+        self.frameTot.grid_rowconfigure(0,weight=1)
+        self.frameBouton.grid_columnconfigure(0,weight=3)
+        self.frameBouton.grid_columnconfigure(1,weight=1)
+        self.frameBouton.grid_columnconfigure(2,weight=2)
 
     def run(self):
         tab = gen_frequences() #création du tableau des fréquences pour détection de la note
@@ -119,7 +164,9 @@ class Partition(threading.Thread):
 
     def lancer(self):
         if (self.enpause==True):
-            if(self.ETitre.get()!="." and self.ETitre.get()!=".." and self.ETitre.get()!="" and self.ETempo.get()!=""):
+            self.bouton_lancer.config(background="#B38C30", fg="WHITE")
+            self.bouton_stop.config(background="WHITE", fg="#B38C30")
+            if(self.ETitre.get()!="." and self.ETitre.get()!=".." and self.ETitre.get()!="" and self.ETempo.get()!="" and (self.extension1.get()==1 or self.extension2.get()==1)):
                 duree_noire = 60/int(self.ETempo.get()) #TODO est ce que y en a besoin ici ? je crois que non
                 #print("duree noire : ",duree_noire)
                 global start #faire de start une variable globale
@@ -128,7 +175,7 @@ class Partition(threading.Thread):
                 self.enpause=False
                 self.chrono.startChrono()
             else :
-                self.erreur["text"]="Erreur du titre ou du tempo"
+                self.erreur["text"]="Erreur du titre ou du tempo ou aucun format séléctionné"
 
     def pause(self):
         if(self.ETempo.get()!=""):
@@ -141,7 +188,10 @@ class Partition(threading.Thread):
                 duree = end - start
                 self.chrono.stopChrono()
                 self.chrono.resetChrono()
+                self.bouton_lancer.config(background="WHITE", fg="#B38C30")
+                self.bouton_stop.config(background="#B38C30", fg="WHITE")
                 if(duree < 3):
+                    self.erreur["text"]="Durée inférieure à 3 secondes, temps insuffisant"
                     print("duree inférieure à 3 secondes, temps insuffisant")
                     return
 
@@ -149,6 +199,7 @@ class Partition(threading.Thread):
                     duree_chunk = duree/len(tab_MIDI_song) #durée d'un chunk
                     #print(duree_chunk)
                 else:
+                    self.erreur["text"]="Erreur notes non enregistrées"
                     print("erreur notes non enregistrées")
                     return
 

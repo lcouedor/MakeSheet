@@ -58,8 +58,16 @@ class Chrono():
         self.root=fenetre
         self.t = StringVar()
         self.t.set("00:00")
-        self.lb = Label(self.root,textvariable=self.t)
-        self.lb.pack()
+        self.frameChrono=Frame(self.root)
+        self.imageChrono=PhotoImage(file='chrono.png')
+        self.labelImage=Label(self.frameChrono,image=self.imageChrono)
+        self.labelImage.config(background="#D9D9D9")
+        self.lb = Label(self.frameChrono,textvariable=self.t)
+        self.lb.grid(row=0,column=1)
+        self.labelImage.grid(row=0,column=0)
+        self.lb.config(background="#D9D9D9",font=20)
+        self.frameChrono.grid(row=0,column=1,sticky='WE')
+        self.frameChrono.config(background="#D9D9D9")
         self.start=0
         self.count=1
 
