@@ -131,7 +131,6 @@ class Partition(threading.Thread):
 
             #Stocker les informations par chunk
             for i in range(0, int(fs / chunk * seconds)):
-                #print(i)
                 data = stream.read(chunk)
                 frames.append(data)
 
@@ -168,7 +167,6 @@ class Partition(threading.Thread):
             self.bouton_stop.config(background="WHITE", fg="#B38C30")
             if(self.ETitre.get()!="." and self.ETitre.get()!=".." and self.ETitre.get()!="" and self.ETempo.get()!="" and (self.extension1.get()==1 or self.extension2.get()==1)):
                 duree_noire = 60/int(self.ETempo.get()) #TODO est ce que y en a besoin ici ? je crois que non
-                #print("duree noire : ",duree_noire)
                 global start #faire de start une variable globale
                 start = timer() #clock
                 self.erreur["text"]=""
@@ -192,21 +190,15 @@ class Partition(threading.Thread):
                 self.bouton_stop.config(background="#B38C30", fg="WHITE")
                 if(duree < 3):
                     self.erreur["text"]="Durée inférieure à 3 secondes, temps insuffisant"
-                    print("duree inférieure à 3 secondes, temps insuffisant")
                     return
 
                 if(len(tab_MIDI_song) !=0):
                     duree_chunk = duree/len(tab_MIDI_song) #durée d'un chunk
-                    #print(duree_chunk)
                 else:
                     self.erreur["text"]="Erreur notes non enregistrées"
-                    print("erreur notes non enregistrées")
                     return
 
-                print("tableau midi : ",tab_MIDI_song)
                 (tab_coeff_MIDI,tab_notes_MIDI)=arrange_MIDI()
-                print(tab_notes_MIDI)
-                print(tab_coeff_MIDI)
                 
                 #Création du fichier Midi
                 mf = MIDIFile(1) #MidiFile à une portée
@@ -214,12 +206,16 @@ class Partition(threading.Thread):
 
                 time = 0 #temps de départ
                 mf.addTrackName(track, time, "Sample Track")
-                mf.addTempo(track, time, int(self.ETempo.get()))
+                #mf.addTempo(track, time, int(self.ETempo.get()))
+                mf.addTimeSignature(track, time,4,4,60,notes_per_quarter=8)
 
                 channel = 0
                 volume = 100
 
+                #mf.addProgramChange(track, channel, time, 72)
+
                 for i in range(len(tab_notes_MIDI)): #Parcours des notes de tab_MIDI_song
+                    #mf.addProgramChange(0, i, 0, 72)
                     if(tab_notes_MIDI[i] == "-"): #Si pas de note on laisse un silence
                         time+=(tab_coeff_MIDI[i]*duree_chunk)/duree_noire
                     else: #Sinon on ajoute la note avec une durée de 1
