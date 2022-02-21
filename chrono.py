@@ -59,7 +59,7 @@ class Chrono():
         self.t = StringVar()
         self.t.set("00:00")
         self.frameChrono=Frame(self.root)
-        self.imageChrono=PhotoImage(file='chrono.png')
+        self.imageChrono=PhotoImage(file='images/chrono.png')
         self.labelImage=Label(self.frameChrono,image=self.imageChrono)
         self.labelImage.config(background="#D9D9D9")
         self.lb = Label(self.frameChrono,textvariable=self.t)

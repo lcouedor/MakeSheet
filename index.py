@@ -65,13 +65,13 @@ fenetre.grid_rowconfigure(1,weight=1)
 fenetre.config(background="WHITE")#Couleur du background
 frameBouton= Frame(fenetre)#création de la zone de bouton
 frameBouton.config(background="WHITE")
-imLogo= PIL.Image.open("logo.png")
+imLogo= PIL.Image.open("images/logo.png")
 resolution = (60,60)
 logoImage= PIL.ImageTk.PhotoImage(imLogo.resize(resolution))
-homeImage=PhotoImage(file='accueil.png')
-tunerImage=PhotoImage(file='tuner.png')
-partitionImage=PhotoImage(file='partition.png')
-parametreImage=PhotoImage(file='parametres.png')
+homeImage=PhotoImage(file='images/accueil.png')
+tunerImage=PhotoImage(file='images/tuner.png')
+partitionImage=PhotoImage(file='images/partition.png')
+parametreImage=PhotoImage(file='images/parametres.png')
 logo=Label(frameBouton,image=logoImage, background="WHITE")
 accueil=Button(frameBouton, text="Accueil",image=homeImage,compound='top', command=AccueilPageFct, background="WHITE", bd=0, fg="#B38C30")#Bouton pour accéder à l'accueil
 tuner=Button(frameBouton, text="Tuner",image=tunerImage,compound='top', command=TunerPageFct,  background="WHITE", bd=0)#Bouton pour accèder à l'accordeur

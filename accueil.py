@@ -17,7 +17,7 @@ class Accueil():
         self.label.grid(row=0,column=0,padx=0, pady=20)
         self.pa=pa
         self.frameTot=Frame(self.fenetre)
-        self.imLogo= PIL.Image.open("logo.png")
+        self.imLogo= PIL.Image.open("images/logo.png")
         self.resolution = (250,250)    
         self.logoImage= PIL.ImageTk.PhotoImage(self.imLogo.resize(self.resolution))
         self.imlabel=Label(self.frameTot,image=self.logoImage)
