@@ -1,4 +1,4 @@
-from distutils import extension
+#from distutils import extension #TODO y a besoin de ça ?
 import threading
 import pyaudio
 import wave
@@ -7,18 +7,18 @@ import numpy as np
 from back import *
 from tkinter import *
 import time
-from math import *
 import os
 from midiutil.MidiFile import MIDIFile
 from timeit import default_timer as timer
-from music21 import converter, instrument
+import music21 as m
 from chrono import * 
+import math
+from ParametresPage import * #TODO peut etre plus besoin après, juste pour récupérer chemin
 
 def only_numbers(char):
     return char.isdigit()
 
 def titreValide(char):
-    #TODO ajouter des caractères interdits si nécessaire
     pattern = "(?=.*:)[^^:]*|\\<>"
     return not(char in pattern)
 
@@ -28,6 +28,7 @@ end = 0
 class Partition(threading.Thread):
 
     def __init__(self,fenetre,p):
+
         threading.Thread.__init__(self)
         self._stopevent = threading.Event( )
         self.enpause=True #variable booleaine pour savoir si il faut stopper ou continuer le programme
@@ -86,7 +87,7 @@ class Partition(threading.Thread):
         self.vide.grid(row=1,column=1)
         self.frameBouton.grid(row=2,column=0)
         self.p=p
-        self.filename="output.wav" #nom du fichier temporaire ou est enregistré le son #TODO nom de fichier fait casser avec celui de tunerpage
+        self.filename="output1.wav"
         self.rm=0
         self.frameParametres.grid(padx=30, pady=0)
         self.label.grid(padx=0, pady=20)
@@ -113,19 +114,19 @@ class Partition(threading.Thread):
         chunk = 2048*2 #enregistrement en morceaux de x samples
         seconds = chunk/fs #analyse sur la durée d'un chunk pour analyser un chunk à la fois
 
+        #Ouverture du micro
+        stream = self.p.open(format=sample_format,
+                        channels=channels,
+                        rate=fs,
+                        frames_per_buffer=chunk,
+                        input=True)
+
         while not self._stopevent.isSet():
             while self.enpause:
                 if os.path.exists(self.filename) and self.rm==1 :
                     os.remove(self.filename) #supprime le fichier temporaire
                     self.rm=0
                 time.sleep(0.5)
-            
-            #Ouverture du micro
-            stream = self.p.open(format=sample_format,
-                            channels=channels,
-                            rate=fs,
-                            frames_per_buffer=chunk,
-                            input=True)
 
             frames = []
 
@@ -143,9 +144,8 @@ class Partition(threading.Thread):
             wf.close()
 
             #Main frequency of a given file
-            file_path = "output.wav"
+            file_path = "output1.wav"
             data, frate  = soundfile.read(file_path, dtype='int16')
-            data_size = len(data)
 
             w = np.fft.fft(data)
 
@@ -166,7 +166,7 @@ class Partition(threading.Thread):
             self.bouton_lancer.config(background="#B38C30", fg="WHITE")
             self.bouton_stop.config(background="WHITE", fg="#B38C30")
             if(self.ETitre.get()!="." and self.ETitre.get()!=".." and self.ETitre.get()!="" and self.ETempo.get()!="" and (self.extension1.get()==1 or self.extension2.get()==1)):
-                duree_noire = 60/int(self.ETempo.get()) #TODO est ce que y en a besoin ici ? je crois que non
+                #duree_noire = 60/int(self.ETempo.get()) #TODO est ce que y en a besoin ici ? je crois que non
                 global start #faire de start une variable globale
                 start = timer() #clock
                 self.erreur["text"]=""
@@ -198,24 +198,21 @@ class Partition(threading.Thread):
                     self.erreur["text"]="Erreur notes non enregistrées"
                     return
 
-                (tab_coeff_MIDI,tab_notes_MIDI)=arrange_MIDI()
+                tab_coeff_MIDI,tab_notes_MIDI=arrange_MIDI()
                 
                 #Création du fichier Midi
                 mf = MIDIFile(1) #MidiFile à une portée
                 track = 0 #définition de la portée de référence
 
                 time = 0 #temps de départ
-                mf.addTrackName(track, time, "Sample Track")
-                #mf.addTempo(track, time, int(self.ETempo.get()))
-                mf.addTimeSignature(track, time,4,4,60,notes_per_quarter=8)
+                mf.addTrackName(track, time, self.ETitre.get())
+                mf.addTempo(track, time, int(self.ETempo.get()))
+                mf.addTimeSignature(track, time,3,round(math.sqrt(4)),24,notes_per_quarter=8) #TODO traiter le time signature
 
                 channel = 0
                 volume = 100
 
-                #mf.addProgramChange(track, channel, time, 72)
-
                 for i in range(len(tab_notes_MIDI)): #Parcours des notes de tab_MIDI_song
-                    #mf.addProgramChange(0, i, 0, 72)
                     if(tab_notes_MIDI[i] == "-"): #Si pas de note on laisse un silence
                         time+=(tab_coeff_MIDI[i]*duree_chunk)/duree_noire
                     else: #Sinon on ajoute la note avec une durée de 1
@@ -230,6 +227,56 @@ class Partition(threading.Thread):
                     mf.writeFile(outf)  
 
                 mf.close()
+
+                musescore = open('serial/musescore', 'r')
+                cheminMusescore = str(musescore.read())+'MuseScore3.exe'
+                musescore.close()
+
+                fichier = open('serial/file', 'r')
+                cheminFichier = str(fichier.read())
+                fichier.close()
+
+                if(self.extension2.get()==1): #Partition cochée, on la créée et on supprime le fichier temporaire une fois fini
+
+                    us = m.environment.UserSettings()
+                    us['musescoreDirectPNGPath'] = cheminMusescore
+                    us['musicxmlPath'] = cheminMusescore
+
+                    parsed = m.converter.parse(titre+".mid")
+
+                    conv_musicxml = m.converter.subConverters.ConverterMusicXML()
+                    scorename = titre+'.xml'
+                    filepath = scorename
+                    conv_musicxml.write(parsed, 'musicxml', fp=filepath, subformats=['pdf'])
+                    supprime = False
+                    while(not(supprime)):
+                        if (os.path.exists(titre +'.musicxml')):
+                            supprime = True
+                            os.remove(titre +'.musicxml')
+
+                    if(os.path.exists(cheminFichier+titre+".pdf")):
+                        os.remove(cheminFichier+titre+".pdf")
+
+                    if(os.path.exists(cheminFichier+titre+".mid")):
+                        os.remove(cheminFichier+titre+".mid")
+
+                    os.rename(os.getcwd()+"/"+titre+".pdf", cheminFichier+titre+".pdf")
+
+                if(self.extension1.get()==0): #Pas de fichier MIDI, on le supprime une fois la partition créée
+                    supprime = False
+                    while(not(supprime)):
+                        if (os.path.exists(cheminFichier + titre +'.pdf') and os.path.exists(titre +'.mid')):
+                            supprime = True
+                            os.remove(titre +'.mid')
+
+                if(self.extension1.get()==1):
+                    move = False
+                    while(not(move)):
+                        if (os.path.exists(titre +'.mid')):
+                            move = True
+                            os.rename(os.getcwd()+"/"+titre+".mid", cheminFichier+titre+".mid")
+
+ 
         else :
             if (self.enpause==False):
                 self.enpause=True

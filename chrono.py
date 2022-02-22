@@ -18,29 +18,6 @@ class Chrono():
         
     def timerChrono(self):
         if(self.count==0):
-            # self.d = str(self.t.get())
-            # m,s = map(int,self.d.split(":"))
-            
-            # m=int(m)
-            # s= int(s)
-            # if(s<59):
-            #     s+=1
-            # elif(s==59):
-            #     s=0
-            #     if(m<59):
-            #         m+=1
-            # if(m<10):
-            #     m = str(0)+str(m)
-            # else:
-            #     m = str(m)
-            # if(s<10):
-            #     s=str(0)+str(s)
-            # else:
-            #     s=str(s)
-            # self.d=m+":"+s
-            
-            
-            # self.t.set(self.d)
             now = default_timer() - self.start
             minutes, seconds = divmod(now, 60)
             minutes=int(minutes)

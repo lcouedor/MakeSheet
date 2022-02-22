@@ -1,9 +1,7 @@
-from cProfile import label
-import numpy as np
+#from cProfile import label #TODO ça sert à rien ça ?
 from back import *
 from ParametresPage import *
 from tkinter import *
-from tkinter import ttk
 import PIL.Image
 import PIL.ImageTk
 

@@ -12,7 +12,6 @@ def gen_octave(base_note):
     tab_octave = dict()
     for i in range(len(tab_notes)):
         base_note = round(base_note*coeff_frequences,2)
-        #base_note = base_note*coeff_frequences
         tab_octave[tab_notes[i]] = base_note
     return tab_octave
 
@@ -37,7 +36,6 @@ def find_Midi_Note(note): #trouver le code midi d'une note à partir de son nom
         return tab_notes.index(note) + 24 + (int(octave)) * 12 #index de la note dans le tableau + 24 (tableau midi commençant à octave -1, nous à octave 1) + 12 (nb notes) * nb octaves - 1
 
 def arrange_MIDI(): #remplir les tableaux tab_notes_MIDI et tab_coeff_MIDI
-    #TODO optimiser la fonction. Avec les noms des variables c'est n'importe quoi
 
     newTab_coeff_MIDI = []
     newTab_notes_MIDI = []
@@ -90,6 +88,7 @@ def arrange_MIDI(): #remplir les tableaux tab_notes_MIDI et tab_coeff_MIDI
     #mettre les tableaux temporaires dans les variables utilisées ailleurs
     tab_notes_MIDI = new3Tab_notes_MIDI
     tab_coeff_MIDI = new3Tab_coeff_MIDI
+
     return (tab_coeff_MIDI,tab_notes_MIDI)
 
 def find_note(frequences, note):
@@ -97,17 +96,15 @@ def find_note(frequences, note):
     #note hors du tableau de fréquence mais à un écart faible : on renvoie la note, sinon : return "-"
     if(note<(frequences[0][tab_notes[0]])/coeff_frequences+((frequences[0][tab_notes[0]])-frequences[0][tab_notes[0]]/coeff_frequences)/2): return ("-",0,0,0,0)
 
-    #TODO param crash freq trop petite
     if(note<frequences[0][tab_notes[0]]) : return ((str(tab_notes[0])+str(0)),frequences[0][tab_notes[0]],round(frequences[0][tab_notes[0]]/coeff_frequences,2),round(frequences[0][tab_notes[0]]*coeff_frequences,2),(100 - (frequences[0][tab_notes[0]]*100 / note)))
 
     if(note>frequences[nb_octaves-1][tab_notes[len(tab_notes) -1]]*coeff_frequences - (frequences[nb_octaves-1][tab_notes[len(tab_notes) -1]]*coeff_frequences - frequences[nb_octaves-1][tab_notes[len(tab_notes) -1]])/2): return ("-",0,0,0,0)
-    #TODO param crash freq trop grande
+
     if(note>frequences[nb_octaves-1][tab_notes[len(tab_notes) -1]]) : return ((str(tab_notes[len(tab_notes) - 1])+str(nb_octaves-1)),frequences[nb_octaves-1][tab_notes[len(tab_notes) -1]],round(frequences[nb_octaves-1][tab_notes[len(tab_notes) -1]]/coeff_frequences,2),round(frequences[nb_octaves-1][tab_notes[len(tab_notes) -1]]*coeff_frequences,2),(100 - (frequences[nb_octaves-1][tab_notes[len(tab_notes) -1]]*100 / note)))
 
     #comparaison du while : entre la premiere valeur de l'octave (le do) et celle de l'octave suivante (peut importe s'il existe ou non dans le tableau)
     while not(note>=frequences[i][tab_notes[0]] and note<=frequences[i][tab_notes[0]]*2): #trouver la bonne octave
         i = i+1
-        #TODO est ce que j'ai vraiment besoin de cette condition ?
         if(i==len(frequences)): #note non présente dans le tableau des fréquences (comparativement au parametre nombre d'octave)
             return ("-",0,0,0,0)
     #l'octave a été trouvée

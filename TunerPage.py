@@ -128,7 +128,7 @@ class Tuner(threading.Thread):
 
             freq_in_hertz = abs(freq * frate)
             res=find_note(tab,freq_in_hertz)
-            notePrec = find_note(tab, freq_in_hertz/coeff_frequences) #nom de la note précédente #TODO ? juste limiter à notePrec[0] pour avoir que le nom (le reste sert à rien pour cette utilisation)
+            notePrec = find_note(tab, freq_in_hertz/coeff_frequences) #nom de la note précédente
             noteSuiv = find_note(tab, freq_in_hertz*coeff_frequences) #nom de la note suivante
             if(res[0]!='-'):
                 self.CAN_Zone.delete(self.CAN_aiguille,self.CAN_norm,self.CAN_Zone_Green,self.CAN_Zone_Red,self.CAN_Zone_Yellow,self.note,self.notePrec,self.noteSucc)#supprimer les formes du canva déjà existantes
