@@ -59,6 +59,7 @@ def ParametrePageFct():
 fenetre = Tk()#Création de la fenêtre 
 fenetre.title("Make Sheet")#Nom de la fenêtre
 fenetre.geometry("1080x720")#Dimension de la fenêtre
+fenetre.tk.call('wm','iconphoto',fenetre._w, PhotoImage(file='images/logo.png'))
 fenetre.minsize(width=800, height=550)
 fenetre.grid_columnconfigure(0,weight=1)
 fenetre.grid_rowconfigure(1,weight=1)
@@ -73,10 +74,10 @@ tunerImage=PhotoImage(file='images/tuner.png')
 partitionImage=PhotoImage(file='images/partition.png')
 parametreImage=PhotoImage(file='images/parametres.png')
 logo=Label(frameBouton,image=logoImage, background="WHITE")
-accueil=Button(frameBouton, text="Accueil",image=homeImage,compound='top', command=AccueilPageFct, background="WHITE", bd=0, fg="#B38C30")#Bouton pour accéder à l'accueil
-tuner=Button(frameBouton, text="Tuner",image=tunerImage,compound='top', command=TunerPageFct,  background="WHITE", bd=0)#Bouton pour accèder à l'accordeur
-partition=Button(frameBouton, text="Partition",image=partitionImage,compound='top', command=PartitionPageFct, background="WHITE", bd=0)#Bouton pour accèder à la partition
-parametre=Button(frameBouton, text="Paramètres",image=parametreImage,compound='top', command=ParametrePageFct, background="WHITE", bd=0)#Bouton pour accèder à la partition
+accueil=Button(frameBouton, text="Accueil",image=homeImage,compound='top', command=AccueilPageFct, background="WHITE", bd=0, fg="#B38C30", cursor="hand2")#Bouton pour accéder à l'accueil
+tuner=Button(frameBouton, text="Tuner",image=tunerImage,compound='top', command=TunerPageFct,  background="WHITE", bd=0, cursor="hand2")#Bouton pour accèder à l'accordeur
+partition=Button(frameBouton, text="Partition",image=partitionImage,compound='top', command=PartitionPageFct, background="WHITE", bd=0, cursor="hand2")#Bouton pour accèder à la partition
+parametre=Button(frameBouton, text="Paramètres",image=parametreImage,compound='top', command=ParametrePageFct, background="WHITE", bd=0, cursor="hand2")#Bouton pour accèder à la partition
 logo.grid(row=0,column=0,sticky='WN')
 accueil.grid(row=0,column=1,sticky='EN')
 tuner.grid(row=0,column=2,sticky='EN')
