@@ -165,21 +165,15 @@ class Partition(threading.Thread):
         if (self.enpause==True):
             self.bouton_lancer.config(background="#B38C30", fg="WHITE")
             self.bouton_stop.config(background="WHITE", fg="#B38C30")
-            if(self.ETitre.get()!="." and self.ETitre.get()!=".." and self.ETitre.get()!="" ):
-                if (self.ETempo.get()!="" ):
-                    if (self.extension1.get()==1 or self.extension2.get()==1) :
-                        #duree_noire = 60/int(self.ETempo.get()) #TODO est ce que y en a besoin ici ? je crois que non
-                        global start #faire de start une variable globale
-                        start = timer() #clock
-                        self.erreur["text"]=""
-                        self.enpause=False
-                        self.chrono.startChrono()
-                    else :
-                        self.erreur["text"]="Erreur : le format est manquant"
-                else:
-                    self.erreur["text"]="Erreur : le tempo est manquant"
+            if(self.ETitre.get()!="." and self.ETitre.get()!=".." and self.ETitre.get()!="" and self.ETempo.get()!="" and (self.extension1.get()==1 or self.extension2.get()==1)):
+                #duree_noire = 60/int(self.ETempo.get()) #TODO est ce que y en a besoin ici ? je crois que non
+                global start #faire de start une variable globale
+                start = timer() #clock
+                self.erreur["text"]=""
+                self.enpause=False
+                self.chrono.startChrono()
             else :
-                self.erreur["text"]="Erreur : le titre est manquant"
+                self.erreur["text"]="Erreur du titre ou du tempo ou aucun format séléctionné"
 
     def pause(self):
         if(self.ETempo.get()!=""):
@@ -195,7 +189,7 @@ class Partition(threading.Thread):
                 self.bouton_lancer.config(background="WHITE", fg="#B38C30")
                 self.bouton_stop.config(background="#B38C30", fg="WHITE")
                 if(duree < 3):
-                    self.erreur["text"]="Erreur : la durée inférieure à 3 secondes, temps insuffisant"
+                    self.erreur["text"]="Durée inférieure à 3 secondes, temps insuffisant"
                     return
 
                 if(len(tab_MIDI_song) !=0):

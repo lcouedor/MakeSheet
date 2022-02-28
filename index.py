@@ -55,11 +55,42 @@ def ParametrePageFct():
     t.pause()
     pr.pause()
 
+def Setup():
+    if(not(os.path.isdir('serial'))):
+        os.mkdir("./serial")
+
+    if(os.path.exists("serial/file")):
+        fichier = open('serial/file', 'r')
+        fic = str(fichier.read())
+        if(len(fic) == 0):
+            fichier.close()
+            fichier = open('serial/file', 'w')
+            fichier.write("C:\\Users\\" + os.getlogin() + "\\Downloads\\")
+            fichier.close()
+    else:
+        fichier = open('serial/file', 'w')
+        fichier.write("C:\\Users\\" + os.getlogin() + "\\Downloads\\")
+        fichier.close()
+        
+    if(os.path.exists("serial/musescore")):
+        musescore = open('serial/musescore', 'r')
+        muse = str(musescore.read())
+        if(len(muse) == 0):
+            musescore.close()
+            musescore = open('serial/musescore', 'w')
+            musescore.write("C:\\Program Files\\MuseScore 3\\bin\\")
+            musescore.close()
+    else:
+        musescore = open('serial/musescore', 'w')
+        musescore.write("C:\\Program Files\\MuseScore 3\\bin\\")
+        musescore.close()
+
+
+Setup() #Initialiser les fichiers d'emplacement de file et musescore, les créé si n'existent pas ou si contenu vide, idem pour le dossier serial
 
 fenetre = Tk()#Création de la fenêtre 
 fenetre.title("Make Sheet")#Nom de la fenêtre
 fenetre.geometry("1080x720")#Dimension de la fenêtre
-fenetre.tk.call('wm','iconphoto',fenetre._w, PhotoImage(file='images/logo.png'))
 fenetre.minsize(width=800, height=550)
 fenetre.grid_columnconfigure(0,weight=1)
 fenetre.grid_rowconfigure(1,weight=1)
@@ -74,10 +105,10 @@ tunerImage=PhotoImage(file='images/tuner.png')
 partitionImage=PhotoImage(file='images/partition.png')
 parametreImage=PhotoImage(file='images/parametres.png')
 logo=Label(frameBouton,image=logoImage, background="WHITE")
-accueil=Button(frameBouton, text="Accueil",image=homeImage,compound='top', command=AccueilPageFct, background="WHITE", bd=0, fg="#B38C30", cursor="hand2")#Bouton pour accéder à l'accueil
-tuner=Button(frameBouton, text="Tuner",image=tunerImage,compound='top', command=TunerPageFct,  background="WHITE", bd=0, cursor="hand2")#Bouton pour accèder à l'accordeur
-partition=Button(frameBouton, text="Partition",image=partitionImage,compound='top', command=PartitionPageFct, background="WHITE", bd=0, cursor="hand2")#Bouton pour accèder à la partition
-parametre=Button(frameBouton, text="Paramètres",image=parametreImage,compound='top', command=ParametrePageFct, background="WHITE", bd=0, cursor="hand2")#Bouton pour accèder à la partition
+accueil=Button(frameBouton, text="Accueil",image=homeImage,compound='top', command=AccueilPageFct, background="WHITE", bd=0, fg="#B38C30")#Bouton pour accéder à l'accueil
+tuner=Button(frameBouton, text="Tuner",image=tunerImage,compound='top', command=TunerPageFct,  background="WHITE", bd=0)#Bouton pour accèder à l'accordeur
+partition=Button(frameBouton, text="Partition",image=partitionImage,compound='top', command=PartitionPageFct, background="WHITE", bd=0)#Bouton pour accèder à la partition
+parametre=Button(frameBouton, text="Paramètres",image=parametreImage,compound='top', command=ParametrePageFct, background="WHITE", bd=0)#Bouton pour accèder à la partition
 logo.grid(row=0,column=0,sticky='WN')
 accueil.grid(row=0,column=1,sticky='EN')
 tuner.grid(row=0,column=2,sticky='EN')
