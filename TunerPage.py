@@ -3,11 +3,12 @@ import pyaudio
 import wave
 import soundfile
 import numpy as np
-from back import *
-from tkinter import *
+import tkinter
 import time
-from math import *
+import math
 import os
+
+import back
 
 class Tuner(threading.Thread):
     def __init__(self,fenetre,p):
@@ -15,19 +16,19 @@ class Tuner(threading.Thread):
         self._stopevent = threading.Event( )
         self.enpause=True #variable booleaine pour savoir si il faut stopper ou continuer le programme
         self.fenetre=fenetre #correspond à la fenetre de la page du tunner
-        self.label = Label(self.fenetre) 
+        self.label = tkinter.Label(self.fenetre) 
         self.label["text"]="Tunner"
         self.label.config(background="#D9D9D9", font=30)
         self.debTot=0 #variable qui contient la fréquence de la note précédente
         self.finTot=0 #variable qui contient la fréquence de la note suivante
         self.finNote=0 #variable qui contient la fréquence de la fin de l'intervalle des fréquences pour la note 
         self.debNote=0 #variable qui contient la fréquence de le début de l'intervalle des fréquences pour la note 
-        self.ecart = Label(self.fenetre)#correspond au label qui affiche l'écart entre la fréquence de la note et la fréquence obtenue
+        self.ecart = tkinter.Label(self.fenetre)#correspond au label qui affiche l'écart entre la fréquence de la note et la fréquence obtenue
         self.ecart["text"]=""
         self.ecart.config(background="#D9D9D9")
         self.label.grid(row=0,column=1)
         self.ecart.grid(row=1,column=1)
-        self.CAN_Zone = Canvas ( self.fenetre , bg = "#D9D9D9" , height = 395 , width = 540, bd=0, highlightthickness=0 ) #canva qui va contenir le compteur
+        self.CAN_Zone = tkinter.Canvas ( self.fenetre , bg = "#D9D9D9" , height = 395 , width = 540, bd=0, highlightthickness=0 ) #canva qui va contenir le compteur
         self.CAN_Zone.grid(row=2,column=1)
         self.CAN_Zone_Total = self.CAN_Zone.create_arc ( 20 , 20 , 520 , 520 , start = 0 , extent = 180 , fill = "#CCD1D1",outline="" )#arc de cercle corresponant à la totalité du compteur
         self.CAN_Zone_Red = self.CAN_Zone.create_arc ( 20 , 20 , 520 , 520 , start=0, extent =0, fill = "#F0B27A",outline="")#arc de cercle corresponant à la partie avant l'intervalle de la note
@@ -44,13 +45,13 @@ class Tuner(threading.Thread):
         self.note=0 #texte dans le canva affichant la note
         self.notePrec=0 #texte dans le canva affichant la note précéente
         self.noteSucc=0 #texte dans le canva affichant la note suivante
-        self.frameBouton= Frame(fenetre)
+        self.frameBouton= tkinter.Frame(fenetre)
         self.frameBouton.config(background="#D9D9D9")
-        self.bouton_lancer = Button(self.frameBouton, text="Lancer", command=self.lancer, background="WHITE", fg="#B38C30") #bouton pour lancer l'accordeur
+        self.bouton_lancer = tkinter.Button(self.frameBouton, text="Lancer", command=self.lancer, background="WHITE", fg="#B38C30") #bouton pour lancer l'accordeur
         self.bouton_lancer.grid(row=1,column=0)
-        self.bouton_stop = Button(self.frameBouton, text="Stop", command=self.pause, background="#B38C30", fg="WHITE")#bouton pour stopper l'accordeur
+        self.bouton_stop = tkinter.Button(self.frameBouton, text="Stop", command=self.pause, background="#B38C30", fg="WHITE")#bouton pour stopper l'accordeur
         self.bouton_stop.grid(row=1,column=2)
-        self.vide=Label(self.frameBouton)
+        self.vide=tkinter.Label(self.frameBouton)
         self.vide["text"]= "      "
         self.vide.config(background="#D9D9D9")
         self.vide.grid(row=1,column=1)
@@ -72,7 +73,7 @@ class Tuner(threading.Thread):
         self.frameBouton.grid_columnconfigure(2,weight=2)
 
     def run(self):
-        tab = gen_frequences() #création du tableau des fréquences pour détection de la note
+        tab = back.gen_frequences() #création du tableau des fréquences pour détection de la note
 
         sample_format = pyaudio.paInt16  # 16 bits per sample
         channels = 1
@@ -115,7 +116,7 @@ class Tuner(threading.Thread):
             #Main frequency of a given file
             file_path = "output.wav"
             data, frate  = soundfile.read(file_path, dtype='int16')
-            data_size = len(data)
+            data_size = len(data) #TODO est ce que data_size sert à quelque chose ?
 
             w = np.fft.fft(data)
 
@@ -127,9 +128,9 @@ class Tuner(threading.Thread):
             freq = freqs[idx]
 
             freq_in_hertz = abs(freq * frate)
-            res=find_note(tab,freq_in_hertz)
-            notePrec = find_note(tab, freq_in_hertz/coeff_frequences) #nom de la note précédente
-            noteSuiv = find_note(tab, freq_in_hertz*coeff_frequences) #nom de la note suivante
+            res=back.find_note(tab,freq_in_hertz)
+            notePrec = back.find_note(tab, freq_in_hertz/back.coeff_frequences) #nom de la note précédente
+            noteSuiv = back.find_note(tab, freq_in_hertz*back.coeff_frequences) #nom de la note suivante
             if(res[0]!='-'):
                 self.CAN_Zone.delete(self.CAN_aiguille,self.CAN_norm,self.CAN_Zone_Green,self.CAN_Zone_Red,self.CAN_Zone_Yellow,self.note,self.notePrec,self.noteSucc)#supprimer les formes du canva déjà existantes
                 self.debTot=res[2]
@@ -137,10 +138,10 @@ class Tuner(threading.Thread):
                 self.finNote=(res[3]+res[1])/2
                 self.debNote=(res[2]+res[1])/2
                 self.ecart["text"]="Ecart : ",res[4]
-                x=int(270+235*cos(radians(180+((freq_in_hertz*180/(self.finTot-self.debTot))-(self.debTot*180/(self.finTot-self.debTot))))))#determine la position x de la fin du segment de l'aiguille 
-                y=int(270+235*sin(radians(180+((freq_in_hertz*180/(self.finTot-self.debTot))-(self.debTot*180/(self.finTot-self.debTot))))))#determine la position y de la fin du segment de l'aiguille 
-                xn=int(270+250*cos(radians(180+((res[1]*180/(self.finTot-self.debTot))-(self.debTot*180/(self.finTot-self.debTot))))))#determine la position x de la fin du segment de la fréquence de la note
-                yn=int(270+250*sin(radians(180+((res[1]*180/(self.finTot-self.debTot))-(self.debTot*180/(self.finTot-self.debTot))))))#determine la position y de la fin du segment de la fréquence de la note
+                x=int(270+235*math.cos(math.radians(180+((freq_in_hertz*180/(self.finTot-self.debTot))-(self.debTot*180/(self.finTot-self.debTot))))))#determine la position x de la fin du segment de l'aiguille 
+                y=int(270+235*math.sin(math.radians(180+((freq_in_hertz*180/(self.finTot-self.debTot))-(self.debTot*180/(self.finTot-self.debTot))))))#determine la position y de la fin du segment de l'aiguille 
+                xn=int(270+250*math.cos(math.radians(180+((res[1]*180/(self.finTot-self.debTot))-(self.debTot*180/(self.finTot-self.debTot))))))#determine la position x de la fin du segment de la fréquence de la note
+                yn=int(270+250*math.sin(math.radians(180+((res[1]*180/(self.finTot-self.debTot))-(self.debTot*180/(self.finTot-self.debTot))))))#determine la position y de la fin du segment de la fréquence de la note
                 self.CAN_Zone_Green = self.CAN_Zone.create_arc ( 20 , 20 , 520 , 520  , start=(self.finTot*180/(self.finTot-self.debTot))-(self.finNote*180/(self.finTot-self.debTot)), extent =(self.finNote*180/(self.finTot-self.debTot))-(self.debNote*180/(self.finTot-self.debTot)), fill = "#82E0AA",outline="")
                 self.CAN_Zone_Red = self.CAN_Zone.create_arc ( 20 , 20 , 520 , 520  , start=(self.finTot*180/(self.finTot-self.debTot))-(self.finNote*180/(self.finTot-self.debTot))+(self.finNote*180/(self.finTot-self.debTot))-(self.debNote*180/(self.finTot-self.debTot)), extent =(self.debNote*180/(self.finTot-self.debTot))-(self.debTot*180/(self.finTot-self.debTot)), fill = "#F0B27A",outline="")
                 self.CAN_Zone_Yellow = self.CAN_Zone.create_arc ( 20 , 20 , 520 , 520  , start=0, extent =(self.finTot*180/(self.finTot-self.debTot))-(self.finNote*180/(self.finTot-self.debTot)), fill = "#F4D03F",outline="")

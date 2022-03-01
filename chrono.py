@@ -1,5 +1,6 @@
-from tkinter import *
+import tkinter
 from timeit import default_timer
+from lib import resource_path
 
 class Chrono():
     
@@ -33,13 +34,13 @@ class Chrono():
         
     def __init__(self, fenetre):
         self.root=fenetre
-        self.t = StringVar()
+        self.t = tkinter.StringVar()
         self.t.set("00:00")
-        self.frameChrono=Frame(self.root)
-        self.imageChrono=PhotoImage(file='images/chrono.png')
-        self.labelImage=Label(self.frameChrono,image=self.imageChrono)
+        self.frameChrono=tkinter.Frame(self.root)
+        self.imageChrono=tkinter.PhotoImage(file=resource_path('images/chrono.png'))
+        self.labelImage=tkinter.Label(self.frameChrono,image=self.imageChrono)
         self.labelImage.config(background="#D9D9D9")
-        self.lb = Label(self.frameChrono,textvariable=self.t)
+        self.lb = tkinter.Label(self.frameChrono,textvariable=self.t)
         self.lb.grid(row=0,column=1)
         self.labelImage.grid(row=0,column=0)
         self.lb.config(background="#D9D9D9",font=20)
