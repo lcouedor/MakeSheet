@@ -1,5 +1,4 @@
-from back import *
-from tkinter import *
+import tkinter
 import tkinter.filedialog
 import os
 
@@ -7,7 +6,7 @@ class Parametre():
 
     def __init__(self,fenetre):
         self.fenetre=fenetre #correspond à la fenetre de la page du tuner
-        self.label = Label(self.fenetre) #correspond au label qui affiche la note
+        self.label = tkinter.Label(self.fenetre) #correspond au label qui affiche la note
         self.user=os.getlogin()
 
         fichier = open('serial/file', 'r')
@@ -22,19 +21,19 @@ class Parametre():
         self.label["text"]="Paramètres"
         self.label.config(background="#D9D9D9", font=30)
         self.label.grid(row=0,column=0,padx=0, pady=20)
-        self.frameParam=Frame(self.fenetre)
-        self.LabelFichier = Label(self.frameParam, text="Chemin du fichier : "+self.cheminFichier)
+        self.frameParam=tkinter.Frame(self.fenetre)
+        self.LabelFichier = tkinter.Label(self.frameParam, text="Chemin du fichier   ->   "+self.cheminFichier)
         self.LabelFichier.config(background="#D9D9D9")
         self.LabelFichier.grid(row=0,column=0,padx=20, pady=0)
-        self.bouton_ValideF = Button(self.frameParam, text="Séléctionner", command=self.validerFichier,  background="#B38C30", fg="WHITE") 
+        self.bouton_ValideF = tkinter.Button(self.frameParam, text="Séléctionner", command=self.validerFichier,  background="#B38C30", fg="WHITE") 
         self.bouton_ValideF.grid(row=0,column=1)
-        self.LabelMuseScore = Label(self.frameParam, text="Chemin de MuseScore : "+self.cheminMuseScore)
+        self.LabelMuseScore = tkinter.Label(self.frameParam, text="Chemin de MuseScore   ->   "+self.cheminMuseScore)
         self.LabelMuseScore.grid(row=1,column=0,padx=20, pady=0)
         self.LabelMuseScore.config(background="#D9D9D9")
-        self.bouton_ValideM = Button(self.frameParam, text="Sélectionner", command=self.validerMuseScore,  background="#B38C30", fg="WHITE") 
+        self.bouton_ValideM = tkinter.Button(self.frameParam, text="Sélectionner", command=self.validerMuseScore,  background="#B38C30", fg="WHITE") 
         self.bouton_ValideM.grid(row=1,column=1)
         self.frameParam.grid(row=1,column=0)
-        self.erreur = Label(self.fenetre) 
+        self.erreur = tkinter.Label(self.fenetre) 
         self.erreur["text"]=""
         self.erreur.config(background="#D9D9D9",fg="RED")
         self.erreur.grid(row=2,column=0)

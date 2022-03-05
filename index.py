@@ -1,12 +1,16 @@
-from tkinter import *
-from TunerPage import *
+import tkinter
 import pyaudio
-from PartitionPage import Partition
-from accueil import Accueil
-from ParametresPage import Parametre
-from back import *
 import PIL.Image
 import PIL.ImageTk
+import os
+
+from PartitionPage import Partition
+from TunerPage import Tuner
+from accueil import Accueil
+from ParametresPage import Parametre
+from lib import resource_path
+
+#TODO quelque part dans le programme il doit y avoir un open pas fermé je crois
 
 def TunerPageFct():
     frameAccueil.grid_forget()
@@ -39,7 +43,7 @@ def AccueilPageFct():
     parametre.config(fg="BLACK")
     accueil.config(fg="#B38C30")
     frameAccueil.grid(row=1,sticky='EWNS')
-    a.miseAjour()
+    #a.miseAjour() #TODO y a pas ça dans le code, c'est quoi ?
     t.pause()
     pr.pause()
 
@@ -85,30 +89,30 @@ def Setup():
         musescore.write("C:\\Program Files\\MuseScore 3\\bin\\")
         musescore.close()
 
-
 Setup() #Initialiser les fichiers d'emplacement de file et musescore, les créé si n'existent pas ou si contenu vide, idem pour le dossier serial
 
-fenetre = Tk()#Création de la fenêtre 
+fenetre = tkinter.Tk()#Création de la fenêtre 
 fenetre.title("Make Sheet")#Nom de la fenêtre
 fenetre.geometry("1080x720")#Dimension de la fenêtre
+fenetre.tk.call('wm','iconphoto',fenetre._w, tkinter.PhotoImage(file='images/logo.png'))
 fenetre.minsize(width=800, height=550)
 fenetre.grid_columnconfigure(0,weight=1)
 fenetre.grid_rowconfigure(1,weight=1)
 fenetre.config(background="WHITE")#Couleur du background
-frameBouton= Frame(fenetre)#création de la zone de bouton
+frameBouton= tkinter.Frame(fenetre)#création de la zone de bouton
 frameBouton.config(background="WHITE")
-imLogo= PIL.Image.open("images/logo.png")
+imLogo= PIL.Image.open(resource_path("images/logo.png"))
 resolution = (60,60)
 logoImage= PIL.ImageTk.PhotoImage(imLogo.resize(resolution))
-homeImage=PhotoImage(file='images/accueil.png')
-tunerImage=PhotoImage(file='images/tuner.png')
-partitionImage=PhotoImage(file='images/partition.png')
-parametreImage=PhotoImage(file='images/parametres.png')
-logo=Label(frameBouton,image=logoImage, background="WHITE")
-accueil=Button(frameBouton, text="Accueil",image=homeImage,compound='top', command=AccueilPageFct, background="WHITE", bd=0, fg="#B38C30")#Bouton pour accéder à l'accueil
-tuner=Button(frameBouton, text="Tuner",image=tunerImage,compound='top', command=TunerPageFct,  background="WHITE", bd=0)#Bouton pour accèder à l'accordeur
-partition=Button(frameBouton, text="Partition",image=partitionImage,compound='top', command=PartitionPageFct, background="WHITE", bd=0)#Bouton pour accèder à la partition
-parametre=Button(frameBouton, text="Paramètres",image=parametreImage,compound='top', command=ParametrePageFct, background="WHITE", bd=0)#Bouton pour accèder à la partition
+homeImage=tkinter.PhotoImage(file=resource_path('images/accueil.png'))
+tunerImage=tkinter.PhotoImage(file=resource_path('images/tuner.png'))
+partitionImage=tkinter.PhotoImage(file=resource_path('images/partition.png'))
+parametreImage=tkinter.PhotoImage(file=resource_path('images/parametres.png'))
+logo=tkinter.Label(frameBouton,image=logoImage, background="WHITE")
+accueil=tkinter.Button(frameBouton, text="Accueil",image=homeImage,compound='top', command=AccueilPageFct, background="WHITE", bd=0, fg="#B38C30", cursor="hand2")#Bouton pour accéder à l'accueil
+tuner=tkinter.Button(frameBouton, text="Tuner",image=tunerImage,compound='top', command=TunerPageFct,  background="WHITE", bd=0, cursor="hand2")#Bouton pour accèder à l'accordeur
+partition=tkinter.Button(frameBouton, text="Partition",image=partitionImage,compound='top', command=PartitionPageFct, background="WHITE", bd=0, cursor="hand2")#Bouton pour accèder à la partition
+parametre=tkinter.Button(frameBouton, text="Paramètres",image=parametreImage,compound='top', command=ParametrePageFct, background="WHITE", bd=0, cursor="hand2")#Bouton pour accèder à la partition
 logo.grid(row=0,column=0,sticky='WN')
 accueil.grid(row=0,column=1,sticky='EN')
 tuner.grid(row=0,column=2,sticky='EN')
@@ -122,18 +126,18 @@ frameBouton.grid_columnconfigure(3,weight=1)
 frameBouton.grid_columnconfigure(4,weight=1)
 #Création des frames pour les différentes page que l'on ajoutera ou supprimera de la fenetre en fonction de la page demandée
 p = pyaudio.PyAudio() #Instanciation de PyAudio
-frameAccueil = Frame(fenetre)
+frameAccueil = tkinter.Frame(fenetre)
 frameAccueil.config(background="#D9D9D9")
 frameAccueil.grid(row=1,sticky='EWNS')
-frameParametres = Frame(fenetre)
+frameParametres = tkinter.Frame(fenetre)
 frameParametres.config(background="#D9D9D9")
 pa=Parametre(frameParametres)
 a=Accueil(frameAccueil,pa)
-frameTuner = Frame(fenetre)
+frameTuner = tkinter.Frame(fenetre)
 frameTuner.config(background="#D9D9D9")
 t=Tuner(frameTuner,p)
 t.start()
-framePartition = Frame(fenetre)
+framePartition = tkinter.Frame(fenetre)
 framePartition.config(background="#D9D9D9")
 pr=Partition(framePartition,p)
 pr.start()

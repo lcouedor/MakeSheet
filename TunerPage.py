@@ -35,11 +35,11 @@ class Tuner(threading.Thread):
         self.CAN_Zone_Yellow = self.CAN_Zone.create_arc ( 20 , 20 , 520 , 520  , start=0, extent =0, fill = "#F4D03F",outline="")#arc de cercle corresponant à la partie après l'intervalle de la note
         self.CAN_aiguille =0 #aiguille du compteur
         self.CAN_norm =0 #segment correspondant à la fréquence de la note
-        self.legendeNote=self.CAN_Zone.create_text(60, 320, anchor="w",text ="Interval de la note" )
+        self.legendeNote=self.CAN_Zone.create_text(60, 320, anchor="w",text ="Intervalle de la note" )
         self.rectangleNote=self.CAN_Zone.create_rectangle(10,310,40,330, fill = "#82E0AA")
-        self.legendeNotePrec=self.CAN_Zone.create_text(60, 350, anchor="w",text = "Interval de la note précédente" )
+        self.legendeNotePrec=self.CAN_Zone.create_text(60, 350, anchor="w",text = "Intervalle de la note précédente" )
         self.rectangleNote=self.CAN_Zone.create_rectangle(10,340,40,360,fill = "#F0B27A")
-        self.legendeNoteSucc=self.CAN_Zone.create_text(60, 380,anchor="w",text = "Interval de la note suivante" )
+        self.legendeNoteSucc=self.CAN_Zone.create_text(60, 380,anchor="w",text = "Intervalle de la note suivante" )
         self.rectangleNote=self.CAN_Zone.create_rectangle(10,370,40,390, fill = "#F4D03F")
         self.note=0 #texte dans le canva affichant la note
         self.notePrec=0 #texte dans le canva affichant la note précéente
@@ -136,15 +136,13 @@ class Tuner(threading.Thread):
                 self.finTot=res[3]
                 self.finNote=(res[3]+res[1])/2
                 self.debNote=(res[2]+res[1])/2
-                self.ecart["text"]="Ecart : ",res[4]
+                self.ecart["text"]="Ecart : "+str(round(res[4],2))+" Hz"
                 x=int(270+235*cos(radians(180+((freq_in_hertz*180/(self.finTot-self.debTot))-(self.debTot*180/(self.finTot-self.debTot))))))#determine la position x de la fin du segment de l'aiguille 
                 y=int(270+235*sin(radians(180+((freq_in_hertz*180/(self.finTot-self.debTot))-(self.debTot*180/(self.finTot-self.debTot))))))#determine la position y de la fin du segment de l'aiguille 
-                xn=int(270+250*cos(radians(180+((res[1]*180/(self.finTot-self.debTot))-(self.debTot*180/(self.finTot-self.debTot))))))#determine la position x de la fin du segment de la fréquence de la note
-                yn=int(270+250*sin(radians(180+((res[1]*180/(self.finTot-self.debTot))-(self.debTot*180/(self.finTot-self.debTot))))))#determine la position y de la fin du segment de la fréquence de la note
                 self.CAN_Zone_Green = self.CAN_Zone.create_arc ( 20 , 20 , 520 , 520  , start=(self.finTot*180/(self.finTot-self.debTot))-(self.finNote*180/(self.finTot-self.debTot)), extent =(self.finNote*180/(self.finTot-self.debTot))-(self.debNote*180/(self.finTot-self.debTot)), fill = "#82E0AA",outline="")
                 self.CAN_Zone_Red = self.CAN_Zone.create_arc ( 20 , 20 , 520 , 520  , start=(self.finTot*180/(self.finTot-self.debTot))-(self.finNote*180/(self.finTot-self.debTot))+(self.finNote*180/(self.finTot-self.debTot))-(self.debNote*180/(self.finTot-self.debTot)), extent =(self.debNote*180/(self.finTot-self.debTot))-(self.debTot*180/(self.finTot-self.debTot)), fill = "#F0B27A",outline="")
                 self.CAN_Zone_Yellow = self.CAN_Zone.create_arc ( 20 , 20 , 520 , 520  , start=0, extent =(self.finTot*180/(self.finTot-self.debTot))-(self.finNote*180/(self.finTot-self.debTot)), fill = "#F4D03F",outline="")
-                self.CAN_norm = self.CAN_Zone.create_line(270, 270 , xn , yn,fill="#8E44AD")
+                self.CAN_norm = self.CAN_Zone.create_line(270, 270 , 270 , 20,fill="#8E44AD")
                 self.CAN_aiguille = self.CAN_Zone.create_line(270, 270, x , y,fill="#E74C3C",width=2,arrow='last')
                 self.note=self.CAN_Zone.create_text(270, 10, text = res[0] )
                 self.notePrec=self.CAN_Zone.create_text(20, 290, text = notePrec[0] )
