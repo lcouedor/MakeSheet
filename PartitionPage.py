@@ -29,7 +29,7 @@ class Partition(threading.Thread):
     def __init__(self,fenetre,p):
 
         threading.Thread.__init__(self)
-        self._stopevent = threading.Event( )
+        self._stopevent = threading.Event()
         self.enpause=True #variable booleaine pour savoir si il faut stopper ou continuer le programme
         self.fenetre=fenetre #correspond à la fenetre de la page du tunner
         self.label = tkinter.Label(self.fenetre) #correspond au label qui affiche la note
@@ -248,7 +248,6 @@ class Partition(threading.Thread):
                     us['musicxmlPath'] = cheminMusescore
 
                     parsed = converter.parse(titre+".mid")
-
                     conv_musicxml = converter.subConverters.ConverterMusicXML()
                     scorename = titre+'.xml'
                     filepath = scorename

@@ -22,7 +22,7 @@ def TunerPageFct():
     tuner.config(fg="#B38C30")
     frameTuner.grid(row=1,sticky='EWNS')
     pr.pause()
-        
+
 def PartitionPageFct():
     frameAccueil.grid_forget()
     frameTuner.grid_forget()
