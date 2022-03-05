@@ -33,7 +33,7 @@ def find_Midi_Note(note): #trouver le code midi d'une note à partir de son nom
     else:
         octave = note[-1] #numéro d'octave
         note = note.replace(octave,"") #nom de la note sans son octave
-        return tab_notes.index(note) + 24 + (int(octave)) * 12 #index de la note dans le tableau + 24 (tableau midi commençant à octave -1, nous à octave 1) + 12 (nb notes) * nb octaves - 1
+        return tab_notes.index(note) + 24 + (int(octave)-1) * 12 #index de la note dans le tableau + 24 (tableau midi commençant à octave -1, nous à octave 1) + 12 (nb notes) * nb octaves - 1
 
 def arrange_MIDI(): #remplir les tableaux tab_notes_MIDI et tab_coeff_MIDI
 
