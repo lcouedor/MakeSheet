@@ -94,7 +94,7 @@ Setup() #Initialiser les fichiers d'emplacement de file et musescore, les créé
 fenetre = tkinter.Tk()#Création de la fenêtre 
 fenetre.title("Make Sheet")#Nom de la fenêtre
 fenetre.geometry("1080x720")#Dimension de la fenêtre
-fenetre.tk.call('wm','iconphoto',fenetre._w, tkinter.PhotoImage(file='images/logo.png'))
+fenetre.tk.call('wm','iconphoto',fenetre._w, tkinter.PhotoImage(file=resource_path('images/logo.png')))
 fenetre.minsize(width=800, height=550)
 fenetre.grid_columnconfigure(0,weight=1)
 fenetre.grid_rowconfigure(1,weight=1)
