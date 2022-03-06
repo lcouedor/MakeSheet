@@ -43,7 +43,6 @@ def AccueilPageFct():
     parametre.config(fg="BLACK")
     accueil.config(fg="#B38C30")
     frameAccueil.grid(row=1,sticky='EWNS')
-    #a.miseAjour() #TODO y a pas ça dans le code, c'est quoi ?
     t.pause()
     pr.pause()
 
@@ -58,6 +57,15 @@ def ParametrePageFct():
     frameParametres.grid(row=1,sticky='EWNS')
     t.pause()
     pr.pause()
+
+def on_closing():
+    t.stop()
+    pr.stop()
+    frameAccueil.destroy()
+    framePartition.destroy()
+    frameTuner.destroy()
+    frameParametres.destroy()
+    fenetre.destroy()
 
 def Setup():
     if(not(os.path.isdir('serial'))):
@@ -141,4 +149,5 @@ framePartition = tkinter.Frame(fenetre)
 framePartition.config(background="#D9D9D9")
 pr=Partition(framePartition,p)
 pr.start()
+fenetre.protocol("WM_DELETE_WINDOW", on_closing)
 fenetre.mainloop()

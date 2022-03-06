@@ -21,6 +21,7 @@ def titreValide(char):
     pattern = "(?=.*:)[^^:]*|\\<>"
     return not(char in pattern)
 
+
 start = 0
 end = 0
 
@@ -31,8 +32,8 @@ class Partition(threading.Thread):
         threading.Thread.__init__(self)
         self._stopevent = threading.Event()
         self.enpause=True #variable booleaine pour savoir si il faut stopper ou continuer le programme
-        self.fenetre=fenetre #correspond à la fenetre de la page du tunner
-        self.label = tkinter.Label(self.fenetre) #correspond au label qui affiche la note
+        self.fenetre=fenetre #correspond à la fenetre de la page de la partition
+        self.label = tkinter.Label(self.fenetre) 
         self.label["text"]="Partition"
         self.label.config(background="#D9D9D9", font=30)
         self.label.grid(row=0,column=0,sticky='N')
@@ -47,18 +48,28 @@ class Partition(threading.Thread):
         self.LabelTitre.config(background="#D9D9D9")
         self.ETitre = tkinter.Entry(self.frameParametres,validate="key", validatecommand=(self.validationTitre, '%S'))
         self.ETitre.grid(row=0, column=1)
-        self.erreur = tkinter.Label(self.frameParametres) #correspond au label qui affiche la note
+        self.erreur = tkinter.Label(self.frameParametres) 
         self.erreur["text"]=""
         self.erreur.config(background="#D9D9D9",fg="RED")
-        self.erreur.grid(row=3, column=1)
+        self.erreur.grid(row=5, column=1)
         self.LabelTempo = tkinter.Label(self.frameParametres, text="Tempo")
         self.LabelTempo.grid(row=1, column=0)
         self.LabelTempo.config(background="#D9D9D9")
         self.ETempo = tkinter.Entry(self.frameParametres,validate="key", validatecommand=(self.validation, '%S'))
         self.ETempo.grid(row=1, column=1)
-        self.LabelExtension=tkinter.Label(self.frameParametres) #correspond au label qui affiche la note
+        self.LabelNumerateur = tkinter.Label(self.frameParametres, text="Numérateur")
+        self.LabelNumerateur.grid(row=2, column=0)
+        self.LabelNumerateur.config(background="#D9D9D9")
+        self.ENumerateur = tkinter.Entry(self.frameParametres,validate="key", validatecommand=(self.validation, '%S'))
+        self.ENumerateur.grid(row=2, column=1)
+        self.LabelDenominateur = tkinter.Label(self.frameParametres, text="Dénominateur")
+        self.LabelDenominateur.grid(row=3, column=0)
+        self.LabelDenominateur.config(background="#D9D9D9")
+        self.EDenominateur = tkinter.Entry(self.frameParametres,validate="key", validatecommand=(self.validation, '%S'))
+        self.EDenominateur.grid(row=3, column=1)
+        self.LabelExtension=tkinter.Label(self.frameParametres) 
         self.LabelExtension["text"]="Le ou les types de fichier(s) : "
-        self.LabelExtension.grid(row=2,column=0)
+        self.LabelExtension.grid(row=4,column=0)
         self.LabelExtension.config(background="#D9D9D9")
         self.frameCheck= tkinter.Frame(self.frameParametres)
         self.frameCheck.config(background="#D9D9D9")
@@ -70,20 +81,14 @@ class Partition(threading.Thread):
         self.checkButton1.config(background="#D9D9D9")
         self.checkButton2.grid(row=0,column=2)
         self.checkButton2.config(background="#D9D9D9")
-        self.frameCheck.grid(row=2,column=1)
+        self.frameCheck.grid(row=4,column=1)
         self.frameParametres.grid(row=0,column=0,sticky='NS')
         self.chrono=Chrono(self.frameTot)
         self.frameTot.grid(row=1,column=0,sticky='WENS')
         self.frameBouton= tkinter.Frame(fenetre)
         self.frameBouton.config(background="#D9D9D9")
-        self.bouton_lancer = tkinter.Button(self.frameBouton, text="Lancer", command=self.lancer,background="WHITE", fg="#B38C30") #bouton pour lancer l'accordeur
+        self.bouton_lancer = tkinter.Button(self.frameBouton, text="Lancer", command=self.estEnPause,background="WHITE", fg="#B38C30") #bouton pour lancer l'accordeur
         self.bouton_lancer.grid(row=1,column=0)
-        self.bouton_stop = tkinter.Button(self.frameBouton, text="Stop", command=self.pause, background="#B38C30", fg="WHITE")#bouton pour stopper l'accordeur
-        self.bouton_stop.grid(row=1,column=2)
-        self.vide=tkinter.Label(self.frameBouton)
-        self.vide["text"]= "      "
-        self.vide.config(background="#D9D9D9")
-        self.vide.grid(row=1,column=1)
         self.frameBouton.grid(row=2,column=0)
         self.p=p
         self.filename="output1.wav"
@@ -96,6 +101,8 @@ class Partition(threading.Thread):
         self.frameParametres.grid_rowconfigure(0,weight=1)
         self.frameParametres.grid_rowconfigure(1,weight=1)
         self.frameParametres.grid_rowconfigure(2,weight=1)
+        self.frameParametres.grid_rowconfigure(3,weight=1)
+        self.frameParametres.grid_rowconfigure(4,weight=1)
         self.frameTot.grid_columnconfigure(0,weight=1)
         self.frameTot.grid_columnconfigure(1,weight=1)
         self.frameTot.grid_rowconfigure(0,weight=1)
@@ -104,23 +111,23 @@ class Partition(threading.Thread):
         self.frameBouton.grid_columnconfigure(2,weight=2)
 
     def run(self):
-        tab = back.gen_frequences() #création du tableau des fréquences pour détection de la note
-
-        sample_format = pyaudio.paInt16  # 16 bits per sample
-        channels = 1
-        fs = 44100  # Nombre de samples par seconde
-        #instrument cible : clarinette -> dernière octave utilisée : 5ème (2kHz) => Théorème de Shannon : 2*2kHz
-        chunk = 2048*2 #enregistrement en morceaux de x samples
-        seconds = chunk/fs #analyse sur la durée d'un chunk pour analyser un chunk à la fois
-
-        #Ouverture du micro
-        stream = self.p.open(format=sample_format,
-                        channels=channels,
-                        rate=fs,
-                        frames_per_buffer=chunk,
-                        input=True)
-
         while not self._stopevent.isSet():
+            tab = back.gen_frequences() #création du tableau des fréquences pour détection de la note
+
+            sample_format = pyaudio.paInt16  # 16 bits per sample
+            channels = 1
+            fs = 44100  # Nombre de samples par seconde
+            #instrument cible : clarinette -> dernière octave utilisée : 5ème (2kHz) => Théorème de Shannon : 2*2kHz
+            chunk = 2048*2 #enregistrement en morceaux de x samples
+            seconds = chunk/fs #analyse sur la durée d'un chunk pour analyser un chunk à la fois
+
+            #Ouverture du micro
+            stream = self.p.open(format=sample_format,
+                            channels=channels,
+                            rate=fs,
+                            frames_per_buffer=chunk,
+                            input=True)
+
             while self.enpause:
                 if os.path.exists(self.filename) and self.rm==1 :
                     os.remove(self.filename) #supprime le fichier temporaire
@@ -158,23 +165,33 @@ class Partition(threading.Thread):
             freq_in_hertz = abs(freq * frate)
             res=back.find_note(tab,freq_in_hertz)
             back.tab_MIDI_song.append(back.find_Midi_Note(res[0]))
-        
+    
+    def estEnPause(self):
+        if self.enpause==False :
+            self.pause()
+        else:
+            self.lancer()
 
     def lancer(self):
         if (self.enpause==True):
-            self.bouton_lancer.config(background="#B38C30", fg="WHITE")
-            self.bouton_stop.config(background="WHITE", fg="#B38C30")
             if(self.ETitre.get()!="." and self.ETitre.get()!=".." and self.ETitre.get()!="" ):
                 if (self.ETempo.get()!="" ):
-                    if (self.extension1.get()==1 or self.extension2.get()==1) :
-                        #duree_noire = 60/int(self.ETempo.get()) #TODO est ce que y en a besoin ici ? je crois que non
-                        global start #faire de start une variable globale
-                        start = timer() #clock
-                        self.erreur["text"]=""
-                        self.enpause=False
-                        self.chrono.startChrono()
-                    else :
-                        self.erreur["text"]="Erreur : le format est manquant"
+                    if(self.ENumerateur.get()!="") :
+                        if(self.EDenominateur.get()=="1" or self.EDenominateur.get()=="2" or self.EDenominateur.get()=="4" or self.EDenominateur.get()=="8" or self.EDenominateur.get()=="16" or self.EDenominateur.get()=="32") :
+                            if (self.extension1.get()==1 or self.extension2.get()==1) :
+                                #duree_noire = 60/int(self.ETempo.get()) #TODO est ce que y en a besoin ici ? je crois que non
+                                global start #faire de start une variable globale
+                                start = timer() #clock
+                                self.erreur["text"]=""
+                                self.enpause=False
+                                self.bouton_lancer.config(background="#B38C30", fg="WHITE", text="Stop")
+                                self.chrono.startChrono()
+                            else :
+                                self.erreur["text"]="Erreur : le format est manquant"
+                        else:
+                            self.erreur["text"]="Erreur : le dénominateur est manquant, il doit être 1, 2, 4, 8, 16 ou 32"
+                    else:
+                        self.erreur["text"]="Erreur : le numérateur est manquant"
                 else:
                     self.erreur["text"]="Erreur : le tempo est manquant"
             else :
@@ -191,8 +208,7 @@ class Partition(threading.Thread):
                 duree = end - start
                 self.chrono.stopChrono()
                 self.chrono.resetChrono()
-                self.bouton_lancer.config(background="WHITE", fg="#B38C30")
-                self.bouton_stop.config(background="#B38C30", fg="WHITE")
+                self.bouton_lancer.config(background="WHITE", fg="#B38C30", text="Lancer")
                 if(duree < 3):
                     self.erreur["text"]="Erreur : la durée inférieure à 3 secondes, temps insuffisant"
                     return
@@ -284,5 +300,8 @@ class Partition(threading.Thread):
         else :
             if (self.enpause==False):
                 self.enpause=True
+    
 
+    def stop(self):
+        self._stopevent.set
 

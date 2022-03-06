@@ -47,14 +47,8 @@ class Tuner(threading.Thread):
         self.noteSucc=0 #texte dans le canva affichant la note suivante
         self.frameBouton= tkinter.Frame(fenetre)
         self.frameBouton.config(background="#D9D9D9")
-        self.bouton_lancer = tkinter.Button(self.frameBouton, text="Lancer", command=self.lancer, background="WHITE", fg="#B38C30") #bouton pour lancer l'accordeur
+        self.bouton_lancer = tkinter.Button(self.frameBouton, text="Lancer", command=self.estEnPause, background="WHITE", fg="#B38C30") #bouton pour lancer l'accordeur
         self.bouton_lancer.grid(row=1,column=0)
-        self.bouton_stop = tkinter.Button(self.frameBouton, text="Stop", command=self.pause, background="#B38C30", fg="WHITE")#bouton pour stopper l'accordeur
-        self.bouton_stop.grid(row=1,column=2)
-        self.vide=tkinter.Label(self.frameBouton)
-        self.vide["text"]= "      "
-        self.vide.config(background="#D9D9D9")
-        self.vide.grid(row=1,column=1)
         self.frameBouton.grid(row=3,column=1)
         self.filename="output.wav" #nom du fichier temporaire ou est enregistré le son
         self.p=p
@@ -73,17 +67,18 @@ class Tuner(threading.Thread):
         self.frameBouton.grid_columnconfigure(2,weight=2)
 
     def run(self):
-        tab = back.gen_frequences() #création du tableau des fréquences pour détection de la note
-
-        sample_format = pyaudio.paInt16  # 16 bits per sample
-        channels = 1
-        fs = 44100  # Nombre de samples par seconde
-        #instrument cible : clarinette -> dernière octave utilisée : 5ème (2kHz) => Théorème de Shannon : 2*2kHz
-        chunk = 2048*2 #enregistrement en morceaux de x samples
-        seconds = chunk/fs #analyse sur la durée d'un chunk pour analyser un chunk à la fois
-
-
         while not self._stopevent.isSet():
+            tab = back.gen_frequences() #création du tableau des fréquences pour détection de la note
+
+            sample_format = pyaudio.paInt16  # 16 bits per sample
+            channels = 1
+            fs = 44100  # Nombre de samples par seconde
+            #instrument cible : clarinette -> dernière octave utilisée : 5ème (2kHz) => Théorème de Shannon : 2*2kHz
+            chunk = 2048*2 #enregistrement en morceaux de x samples
+            seconds = chunk/fs #analyse sur la durée d'un chunk pour analyser un chunk à la fois
+
+
+        
             while self.enpause :
                 if os.path.exists(self.filename) and self.rm==1:
                     os.remove(self.filename) #supprime le fichier temporaire
@@ -151,17 +146,24 @@ class Tuner(threading.Thread):
             
             
 
+    def estEnPause(self):
+        if self.enpause==False :
+            self.pause()
+        else:
+            self.lancer()
+    
     def pause(self):
-        self.bouton_lancer.config(background="WHITE", fg="#B38C30")
-        self.bouton_stop.config(background="#B38C30", fg="WHITE")
+        self.bouton_lancer.config(background="WHITE", fg="#B38C30", text="Lancer")
         self.enpause=True
         self.rm=1
         
 
     def lancer(self):
-        self.bouton_lancer.config(background="#B38C30", fg="WHITE")
-        self.bouton_stop.config(background="WHITE", fg="#B38C30")
+        self.bouton_lancer.config(background="#B38C30", fg="WHITE", text="Stop")
         self.enpause=False
+
+    def stop(self):
+        self._stopevent.set
     
 
 
