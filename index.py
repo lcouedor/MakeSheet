@@ -10,8 +10,6 @@ from accueil import Accueil
 from ParametresPage import Parametre
 from lib import resource_path
 
-#TODO quelque part dans le programme il doit y avoir un open pas fermé je crois
-
 def TunerPageFct():
     frameAccueil.grid_forget()
     framePartition.grid_forget()

@@ -111,7 +111,6 @@ class Tuner(threading.Thread):
             #Main frequency of a given file
             file_path = "output.wav"
             data, frate  = soundfile.read(file_path, dtype='int16')
-            data_size = len(data) #TODO est ce que data_size sert à quelque chose ?
 
             w = np.fft.fft(data)
 
@@ -123,6 +122,7 @@ class Tuner(threading.Thread):
             freq = freqs[idx]
 
             freq_in_hertz = abs(freq * frate)
+            freq_in_hertz = freq_in_hertz/(4/3) #TODO est ce que c'est mieux ? réduction de 5 demi-tons
             res=back.find_note(tab,freq_in_hertz)
             notePrec = back.find_note(tab, freq_in_hertz/back.coeff_frequences) #nom de la note précédente
             noteSuiv = back.find_note(tab, freq_in_hertz*back.coeff_frequences) #nom de la note suivante

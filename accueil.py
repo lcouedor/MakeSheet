@@ -5,7 +5,6 @@ import PIL.ImageTk
 from lib import resource_path
   
 class Accueil():
-    #test de push
     def __init__(self,fenetre,pa):
         self.fenetre=fenetre
         self.label = tkinter.Label(self.fenetre)

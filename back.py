@@ -126,6 +126,6 @@ def find_note(frequences, note):
         noteSucc=octave[octave.index(closest_freq)+1]
     else:
         noteSucc=octave[octave.index(closest_freq)]*coeff_frequences
-    return ((note_joue + str(i)),closest_freq,notePrec,noteSucc,ecart) #afficher la note jouée et son numéro d'octave
+    return ((note_joue + str(i)),closest_freq,notePrec,noteSucc,ecart)
     
 

@@ -163,6 +163,7 @@ class Partition(threading.Thread):
             freq = freqs[idx]
 
             freq_in_hertz = abs(freq * frate)
+            #freq_in_hertz = freq_in_hertz/(4/3) #est ce que c'est mieux ? réduction de 5 demi-tons
             res=back.find_note(tab,freq_in_hertz)
             back.tab_MIDI_song.append(back.find_Midi_Note(res[0]))
     
@@ -179,7 +180,6 @@ class Partition(threading.Thread):
                     if(self.ENumerateur.get()!="") :
                         if(self.EDenominateur.get()=="1" or self.EDenominateur.get()=="2" or self.EDenominateur.get()=="4" or self.EDenominateur.get()=="8" or self.EDenominateur.get()=="16" or self.EDenominateur.get()=="32") :
                             if (self.extension1.get()==1 or self.extension2.get()==1) :
-                                #duree_noire = 60/int(self.ETempo.get()) #TODO est ce que y en a besoin ici ? je crois que non
                                 global start #faire de start une variable globale
                                 start = timer() #clock
                                 self.erreur["text"]=""
@@ -224,11 +224,10 @@ class Partition(threading.Thread):
                 #Création du fichier Midi
                 mf = MIDIFile(1) #MidiFile à une portée
                 track = 0 #définition de la portée de référence
-
                 time = 0 #temps de départ
                 mf.addTrackName(track, time, self.ETitre.get())
                 mf.addTempo(track, time, int(self.ETempo.get()))
-                mf.addTimeSignature(track, time,3,round(math.sqrt(4)),24,notes_per_quarter=8) #TODO traiter le time signature
+                mf.addTimeSignature(track, time,int(self.ENumerateur.get()),round(math.sqrt(int(self.EDenominateur.get()))),24,notes_per_quarter=8)
 
                 channel = 0
                 volume = 100
@@ -244,7 +243,7 @@ class Partition(threading.Thread):
 
                 #Ecrire sur le fichier MIDI 
                 titre = self.ETitre.get()
-                with open(titre+".mid", 'wb') as outf: #dans cette version le arrange_MIDI ne casse pas mais ça oui
+                with open(titre+".mid", 'wb') as outf:
                     mf.writeFile(outf)  
 
                 mf.close()
@@ -296,7 +295,7 @@ class Partition(threading.Thread):
                             move = True
                             os.rename(os.getcwd()+"/"+titre+".mid", cheminFichier+titre+".mid")
 
- 
+
         else :
             if (self.enpause==False):
                 self.enpause=True
