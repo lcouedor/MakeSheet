@@ -10,6 +10,7 @@ from accueil import Accueil
 from ParametresPage import Parametre
 from lib import resource_path
 
+#Fonction d'affichage de la page du tuner
 def TunerPageFct():
     frameAccueil.grid_forget()
     framePartition.grid_forget()
@@ -21,6 +22,7 @@ def TunerPageFct():
     frameTuner.grid(row=1,sticky='EWNS')
     pr.pause()
 
+#Fonction d'affichage de la page de partition
 def PartitionPageFct():
     frameAccueil.grid_forget()
     frameTuner.grid_forget()
@@ -32,6 +34,7 @@ def PartitionPageFct():
     framePartition.grid(row=1,sticky='EWNS')
     t.pause()
 
+#Fonction d'affichage de la page d' accueil
 def AccueilPageFct():
     framePartition.grid_forget()
     frameTuner.grid_forget()
@@ -44,6 +47,7 @@ def AccueilPageFct():
     t.pause()
     pr.pause()
 
+#Fonction d'affichage de la page de paramètre
 def ParametrePageFct():
     framePartition.grid_forget()
     frameTuner.grid_forget()
@@ -56,6 +60,7 @@ def ParametrePageFct():
     t.pause()
     pr.pause()
 
+#Fonction de fermeture de l'application
 def on_closing():
     t.stop()
     pr.stop()

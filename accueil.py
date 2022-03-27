@@ -6,19 +6,21 @@ from lib import resource_path
   
 class Accueil():
     def __init__(self,fenetre,pa):
-        self.fenetre=fenetre
-        self.label = tkinter.Label(self.fenetre)
+        self.fenetre=fenetre#correspond à la fenetre de la page de l'accueil
+        self.label = tkinter.Label(self.fenetre)#correspond au titre de la page
         self.label["text"]="Accueil"
         self.label.config(background="#D9D9D9",font=30)
         self.label.grid(row=0,column=0,padx=0, pady=20)
         self.pa=pa
         self.frameTot=tkinter.Frame(self.fenetre)
+        #Initialisation de l'image
         self.imLogo= PIL.Image.open(resource_path("images/logo.png"))
         self.resolution = (250,250)    
         self.logoImage= PIL.ImageTk.PhotoImage(self.imLogo.resize(self.resolution))
         self.imlabel=tkinter.Label(self.frameTot,image=self.logoImage)
         self.imlabel.grid(row=0,column=1)
         self.imlabel.config(background="#D9D9D9")
+        #Initialisation de la zone de textes
         self.frameTextes=tkinter.Frame(self.frameTot)
         self.textePresentation = tkinter.Label(self.frameTextes,wraplength=300)
         self.textePresentation["text"]="L'application MakeSheet est une application composée d'un accordeur et d'un générateur de partition. Celle-ci a été conçue par Léo Couedor et Alexia Sorin"
@@ -40,6 +42,7 @@ class Accueil():
         self.frameTextes.config(background="#D9D9D9")
         self.frameTot.grid(row=1, column=0)
         self.frameTot.config(background="#D9D9D9")
+        #Initialisation de la taille et des placements des frames et des éléments
         self.fenetre.grid_columnconfigure(0,weight=1)
         self.fenetre.grid_rowconfigure(1,weight=1)
         self.frameTot.grid_columnconfigure(0,weight=1)

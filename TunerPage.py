@@ -145,7 +145,6 @@ class Tuner(threading.Thread):
                 self.noteSucc=self.CAN_Zone.create_text(520, 290, text = noteSuiv[0] )
             
             
-
     def estEnPause(self):
         if self.enpause==False :
             self.pause()

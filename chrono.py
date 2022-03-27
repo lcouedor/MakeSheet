@@ -4,19 +4,22 @@ from lib import resource_path
 
 class Chrono():
     
+    #Fonction qui remet à zéro le chrono
     def resetChrono(self):
         self.count=1
         self.t.set('00:00')
-        
+    
+    #Fonction qui lance le chrono
     def startChrono(self):
         self.count=0
         self.start = default_timer()
         self.timerChrono()
 
+    #Focntion qui stop le chrono
     def stopChrono(self):
         self.count=1
         
-        
+    #Fonction qui calcul le temps
     def timerChrono(self):
         if(self.count==0):
             now = default_timer() - self.start
@@ -34,9 +37,11 @@ class Chrono():
         
     def __init__(self, fenetre):
         self.root=fenetre
+        #Initialisation du texte variable
         self.t = tkinter.StringVar()
         self.t.set("00:00")
         self.frameChrono=tkinter.Frame(self.root)
+        #Initialisation de l'image
         self.imageChrono=tkinter.PhotoImage(file=resource_path('images/chrono.png'))
         self.labelImage=tkinter.Label(self.frameChrono,image=self.imageChrono)
         self.labelImage.config(background="#D9D9D9")

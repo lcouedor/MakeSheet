@@ -5,12 +5,12 @@ import os
 class Parametre():
 
     def __init__(self,fenetre):
-        self.fenetre=fenetre #correspond à la fenetre de la page du tuner
-        self.label = tkinter.Label(self.fenetre) #correspond au label qui affiche la note
+        self.fenetre=fenetre #correspond à la fenetre de la page de la paramètre
+        self.label = tkinter.Label(self.fenetre) #correspond au titre de la page
         self.user=os.getlogin()
 
-        fichier = open('serial/file', 'r')
-        musescore = open('serial/musescore', 'r')
+        fichier = open('serial/file', 'r') #initialisation du chemin vers la zone de fichier
+        musescore = open('serial/musescore', 'r') #initialisation du chemin vers la zone de musescore
 
         self.cheminFichier=str(fichier.read())
         self.cheminMuseScore=str(musescore.read())
@@ -21,7 +21,8 @@ class Parametre():
         self.label["text"]="Paramètres"
         self.label.config(background="#D9D9D9", font=30)
         self.label.grid(row=0,column=0,padx=0, pady=20)
-        self.frameParam=tkinter.Frame(self.fenetre)
+        #initialisation de la zone de séléction des chemins
+        self.frameParam=tkinter.Frame(self.fenetre) 
         self.LabelFichier = tkinter.Label(self.frameParam, text="Chemin du fichier   ->   "+self.cheminFichier)
         self.LabelFichier.config(background="#D9D9D9")
         self.LabelFichier.grid(row=0,column=0,padx=20, pady=0)
@@ -33,6 +34,7 @@ class Parametre():
         self.bouton_ValideM = tkinter.Button(self.frameParam, text="Sélectionner", command=self.validerMuseScore,  background="#B38C30", fg="WHITE") 
         self.bouton_ValideM.grid(row=1,column=1)
         self.frameParam.grid(row=1,column=0)
+        #initialisation de la zone d'erreur
         self.erreur = tkinter.Label(self.fenetre) 
         self.erreur["text"]=""
         self.erreur.config(background="#D9D9D9",fg="RED")
@@ -47,6 +49,7 @@ class Parametre():
         self.frameParam.config(background="#D9D9D9")
         self.frameParam.grid(sticky='NS')
 
+    #Vérification de la validité du chemin du fichier 
     def validerFichier(self):
         cf= tkinter.filedialog.askdirectory ( title = "Sélectionnez un répertoire de destination ..." , mustexist = True, initialdir=self.cheminFichier )
         if len(cf) > 0:
@@ -56,6 +59,7 @@ class Parametre():
             fichier.truncate(0)
             fichier.write(self.cheminFichier+"/")
     
+    #Vérification de la validité du chemin de museScore
     def validerMuseScore(self):
         cc=tkinter.filedialog.askdirectory ( title = "Sélectionnez le répertoire bin de MuseScore ..." , mustexist = True, initialdir=self.cheminMuseScore )
         if len(cc) > 0:

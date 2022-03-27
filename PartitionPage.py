@@ -14,9 +14,11 @@ import math
 import back
 from chrono import Chrono
 
+#Fonction de vérification pour savoir si le paramètre est chiffre ou pas
 def only_numbers(char):
     return char.isdigit()
 
+#Fonction de vérification pour savoir si le paramètre n'est pas un caractère spécial
 def titreValide(char):
     pattern = "(?=.*:)[^^:]*|\\<>"
     return not(char in pattern)
@@ -33,7 +35,7 @@ class Partition(threading.Thread):
         self._stopevent = threading.Event()
         self.enpause=True #variable booleaine pour savoir si il faut stopper ou continuer le programme
         self.fenetre=fenetre #correspond à la fenetre de la page de la partition
-        self.label = tkinter.Label(self.fenetre) 
+        self.label = tkinter.Label(self.fenetre) #correspond au titre de la page
         self.label["text"]="Partition"
         self.label.config(background="#D9D9D9", font=30)
         self.label.grid(row=0,column=0,sticky='N')
@@ -41,6 +43,7 @@ class Partition(threading.Thread):
         self.validationTitre = fenetre.register(titreValide)
         self.frameTot= tkinter.Frame(fenetre)
         self.frameTot.config(background="#D9D9D9")
+        #Initialisation de la zone de formulaire
         self.frameParametres= tkinter.Frame(self.frameTot)
         self.frameParametres.config(background="#D9D9D9")
         self.LabelTitre = tkinter.Label(self.frameParametres, text="Titre")
@@ -71,6 +74,7 @@ class Partition(threading.Thread):
         self.LabelExtension["text"]="Le ou les types de fichier(s) : "
         self.LabelExtension.grid(row=4,column=0)
         self.LabelExtension.config(background="#D9D9D9")
+        #Initialisation de la zone de checkBox
         self.frameCheck= tkinter.Frame(self.frameParametres)
         self.frameCheck.config(background="#D9D9D9")
         self.extension1 = tkinter.IntVar()
@@ -85,6 +89,7 @@ class Partition(threading.Thread):
         self.frameParametres.grid(row=0,column=0,sticky='NS')
         self.chrono=Chrono(self.frameTot)
         self.frameTot.grid(row=1,column=0,sticky='WENS')
+        #Initialisation de la zone de bouton
         self.frameBouton= tkinter.Frame(fenetre)
         self.frameBouton.config(background="#D9D9D9")
         self.bouton_lancer = tkinter.Button(self.frameBouton, text="Lancer", command=self.estEnPause,background="WHITE", fg="#B38C30") #bouton pour lancer l'accordeur
@@ -93,6 +98,7 @@ class Partition(threading.Thread):
         self.p=p
         self.filename="output1.wav"
         self.rm=0
+        #Mise en page 
         self.frameParametres.grid(padx=30, pady=0)
         self.label.grid(padx=0, pady=20)
         self.fenetre.grid_rowconfigure(1,weight=1)
@@ -175,6 +181,7 @@ class Partition(threading.Thread):
 
     def lancer(self):
         if (self.enpause==True):
+            #Mise en place de différents teste validant ou nom les informations données
             if(self.ETitre.get()!="." and self.ETitre.get()!=".." and self.ETitre.get()!="" ):
                 if (self.ETempo.get()!="" ):
                     if(self.ENumerateur.get()!="") :
